@@ -1,17 +1,19 @@
-# Purpose :-
+# Purpose:
 # Safely walk a repository and build the file index.
 # Hard rules enforced here:
-# No .git/
-# No node_modules/
-# No binaries
-# Max file size
-# Read-only
+# - No .git/
+# - No node_modules/
+# - No binaries
+# - Max file size
+# - Read-only
+# - Hard file-count limit (ScanGuard)
 
 from pathlib import Path
 from typing import Dict, List
 import mimetypes
 
 from .classifier import classify_file
+from multi_repo_analyzer.core.safety import ScanGuard
 
 
 IGNORED_DIRS = {
@@ -20,7 +22,6 @@ IGNORED_DIRS = {
     ".venv",
     "__pycache__",
 }
-
 
 DEFAULT_MAX_FILE_SIZE = 1_000_000  # 1 MB
 
@@ -35,6 +36,7 @@ def is_binary_file(path: Path) -> bool:
 def walk_repository(
     root_path: Path,
     max_file_size: int = DEFAULT_MAX_FILE_SIZE,
+    guard: ScanGuard | None = None,
 ) -> Dict[str, List[Path]]:
     if not root_path.exists():
         raise FileNotFoundError(f"Path does not exist: {root_path}")
@@ -42,6 +44,9 @@ def walk_repository(
     files_by_language: Dict[str, List[Path]] = {}
 
     for path in root_path.rglob("*"):
+        if guard:
+            guard.tick()
+
         if not path.is_file():
             continue
 

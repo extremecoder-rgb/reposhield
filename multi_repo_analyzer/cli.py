@@ -5,6 +5,7 @@ from pathlib import Path
 
 from multi_repo_analyzer.ingest import walk_repository
 from multi_repo_analyzer.core import ScanContext, ScanReport
+from multi_repo_analyzer.core.safety import ScanGuard, ScanLimitExceeded
 from multi_repo_analyzer.report.generator import generate_report
 
 from multi_repo_analyzer.analyzer.registry import AnalyzerRegistry
@@ -42,7 +43,16 @@ def main() -> None:
 def run_scan(path: str, output: str | None) -> None:
     repo_path = Path(path).resolve()
 
-    files_by_language = walk_repository(repo_path)
+    guard = ScanGuard(max_files=10_000)
+
+    try:
+        files_by_language = walk_repository(
+            repo_path,
+            guard=guard,
+        )
+    except ScanLimitExceeded as exc:
+        print(f"Scan aborted: {exc}", file=sys.stderr)
+        sys.exit(2)
 
     context = ScanContext(
         root_path=repo_path,
