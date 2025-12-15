@@ -1,16 +1,8 @@
-# {
-#   "tool": { ... },
-#   "scan": { ... },
-#   "risk": { ... },
-#   "findings": [ ... ],
-#   "notes": [ ... ]
-# }
-
-
 from typing import List, Dict
 
 from multi_repo_analyzer.core import ScanReport, Finding
 from multi_repo_analyzer.core.scoring import calculate_risk
+from multi_repo_analyzer.core.correlation import correlate_findings
 
 
 REPORT_VERSION = "1.0"
@@ -20,7 +12,11 @@ def generate_report(report: ScanReport) -> Dict:
     """
     Generate the final JSON-serializable report.
     """
-    score, verdict = calculate_risk(report.findings)
+
+    # 🔹 NEW: correlate findings before scoring
+    correlated_findings = correlate_findings(report.findings)
+
+    score, verdict = calculate_risk(correlated_findings)
 
     return {
         "version": REPORT_VERSION,
@@ -36,7 +32,7 @@ def generate_report(report: ScanReport) -> Dict:
             "score": score,
             "verdict": verdict,
         },
-        "findings": [f.to_dict() for f in report.findings],
+        "findings": [f.to_dict() for f in correlated_findings],
         "notes": _generate_notes(verdict),
     }
 
