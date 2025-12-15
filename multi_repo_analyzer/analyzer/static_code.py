@@ -5,6 +5,7 @@ from typing import List
 from multi_repo_analyzer.analyzer.base import Analyzer
 from multi_repo_analyzer.core import Finding, Severity, Category, ScanContext
 from multi_repo_analyzer.core.confidence import adjust_confidence
+from multi_repo_analyzer.core.file_context import classify_file_context
 
 
 DANGEROUS_CALLS = {
@@ -26,11 +27,19 @@ class StaticCodeAnalyzer(Analyzer):
 
         for path in context.files_by_language.get("python", []):
             source = path.read_text(errors="ignore")
+            file_context = classify_file_context(path)
 
             # ---- REGEX / STRING-LEVEL DETECTION (WEAK SIGNAL) ----
             if "os.system" in source or "eval(" in source or "exec(" in source:
+                base_confidence = 0.4
+
+                if file_context in {"INSTALL", "CI"}:
+                    base_confidence += 0.1
+                elif file_context == "LOW_RISK":
+                    base_confidence -= 0.1
+
                 confidence = adjust_confidence(
-                    base=0.4,
+                    base=base_confidence,
                     is_test_file=self._is_test_file(path),
                     ast_confirmed=False,
                 )
@@ -67,8 +76,15 @@ class StaticCodeAnalyzer(Analyzer):
 
                 call_name = self._get_call_name(node.func)
                 if call_name in DANGEROUS_CALLS:
+                    base_confidence = 0.8
+
+                    if file_context in {"INSTALL", "CI"}:
+                        base_confidence += 0.1
+                    elif file_context == "LOW_RISK":
+                        base_confidence -= 0.2
+
                     confidence = adjust_confidence(
-                        base=0.8,
+                        base=base_confidence,
                         is_test_file=self._is_test_file(path),
                         ast_confirmed=True,
                     )
@@ -95,14 +111,8 @@ class StaticCodeAnalyzer(Analyzer):
 
         return findings
 
-    # ---- FIXED HELPER ----
+    # ---- SAFE AST NAME RESOLUTION ----
     def _get_call_name(self, node) -> str:
-        """
-        Safely resolve function call names like:
-        - os.system
-        - subprocess.run
-        - eval
-        """
         if isinstance(node, ast.Name):
             return node.id
 
@@ -112,10 +122,15 @@ class StaticCodeAnalyzer(Analyzer):
 
         return ""
 
+    # ---- FIXED TEST FILE DETECTION ----
     def _is_test_file(self, path: Path) -> bool:
-        lowered = str(path).lower()
-        return (
-            "test" in lowered
-            or "/tests/" in lowered
-            or "\\tests\\" in lowered
-        )
+        parts = {p.lower() for p in path.parts}
+        filename = path.name.lower()
+
+        if "tests" in parts:
+            return True
+
+        if filename.startswith("test_") or filename.endswith("_test.py"):
+            return True
+
+        return False
