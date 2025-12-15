@@ -1,45 +1,3 @@
-# Inputs
-# Each Finding contributes risk based on:
-# severity
-# confidence
-# category
-
-# Output
-# risk_score (0–100)
-# verdict: SAFE, CAUTION, RISKY
-
-# Severity Weights 
-# LOW       → 1
-# MEDIUM    → 3
-# HIGH      → 7
-# CRITICAL  → 10
-
-# Category Weights 
-# CODE_EXECUTION → 1.5
-# OBFUSCATION   → 1.2
-# SECRETS       → 1.4
-# SUPPLY_CHAIN  → 1.6
-# CI_CD         → 1.3
-# CONFIGURATION → 1.0
-# NETWORK       → 1.4
-
-
-# These weights reflect blast radius, not “badness”.
-
-# Score Formula 
-
-# For each finding:
-
-# finding_score =
-#     severity_weight
-#   × confidence
-#   × category_weight
-
-
-# Total score = sum of all finding scores
-
-# Then normalize → 0–100 scale
-
 from typing import List, Tuple
 
 from multi_repo_analyzer.core import Finding, Severity, Category
@@ -62,41 +20,52 @@ CATEGORY_WEIGHTS = {
     Category.NETWORK: 1.4,
 }
 
+MAX_SINGLE_FINDING_SCORE = 15.0
+NORMALIZATION_FACTOR = 7.5
+
 
 def calculate_risk(findings: List[Finding]) -> Tuple[float, str]:
     """
-    Calculate total risk score and verdict.
+    Calculate calibrated risk score and verdict.
 
-    Returns:
-        (score, verdict)
+    Phase 2 goals:
+    - Low confidence is penalized
+    - Correlated findings accumulate
+    - No single finding dominates
     """
+
     total_score = 0.0
 
     for finding in findings:
-        # Skip framework error findings
         if finding.severity is None or finding.category is None:
             continue
 
         severity_weight = SEVERITY_WEIGHTS.get(finding.severity, 1.0)
         category_weight = CATEGORY_WEIGHTS.get(finding.category, 1.0)
 
-        total_score += (
+        # Confidence penalty (important)
+        confidence_factor = finding.confidence ** 2
+
+        raw_score = (
             severity_weight
-            * finding.confidence
             * category_weight
+            * confidence_factor
         )
 
-    # Normalize (soft cap)
-    normalized = min(total_score * 5, 100.0)
+        capped = min(raw_score, MAX_SINGLE_FINDING_SCORE)
+        total_score += capped
+
+    normalized = min(total_score * NORMALIZATION_FACTOR, 100.0)
+    normalized = round(normalized, 2)
 
     verdict = _map_verdict(normalized)
-
-    return round(normalized, 2), verdict
+    return normalized, verdict
 
 
 def _map_verdict(score: float) -> str:
+    # 🔧 FINAL calibrated thresholds
     if score < 20:
         return "SAFE"
-    if score < 50:
+    if score < 40:
         return "CAUTION"
     return "RISKY"
