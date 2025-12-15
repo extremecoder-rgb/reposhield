@@ -6,6 +6,7 @@ from multi_repo_analyzer.analyzer.base import Analyzer
 from multi_repo_analyzer.core import Finding, Severity, Category, ScanContext
 from multi_repo_analyzer.core.confidence import adjust_confidence
 from multi_repo_analyzer.core.file_context import classify_file_context
+from multi_repo_analyzer.core.explanations import enrich_why_it_matters
 
 
 DANGEROUS_CALLS = {
@@ -19,6 +20,14 @@ DANGEROUS_CALLS = {
 
 
 class StaticCodeAnalyzer(Analyzer):
+    """
+    Detects dangerous dynamic execution patterns in Python code.
+
+    This analyzer intentionally emits:
+    - weak string-based signals (low confidence)
+    - strong AST-confirmed signals (high confidence)
+    """
+
     name = "static_code"
     supported_languages = {"python"}
 
@@ -29,7 +38,7 @@ class StaticCodeAnalyzer(Analyzer):
             source = path.read_text(errors="ignore")
             file_context = classify_file_context(path)
 
-            # ---- REGEX / STRING-LEVEL DETECTION (WEAK SIGNAL) ----
+            # ---- STRING-LEVEL DETECTION (WEAK SIGNAL) ----
             if "os.system" in source or "eval(" in source or "exec(" in source:
                 base_confidence = 0.4
 
@@ -53,13 +62,13 @@ class StaticCodeAnalyzer(Analyzer):
                         file_path=str(path),
                         line_number=None,
                         message="Suspicious use of dynamic execution",
-                        why_it_matters=(
-                            "Dynamic code execution or shell invocation can "
-                            "allow arbitrary command execution."
+                        why_it_matters=enrich_why_it_matters(
+                            Category.CODE_EXECUTION,
+                            "Dynamic execution allows code to invoke system commands at runtime."
                         ),
                         recommendation=(
-                            "Avoid dynamic execution and validate all inputs. "
-                            "Use safer alternatives where possible."
+                            "Avoid dynamic execution where possible. "
+                            "If required, strictly validate inputs and isolate execution."
                         ),
                     )
                 )
@@ -97,14 +106,14 @@ class StaticCodeAnalyzer(Analyzer):
                             confidence=confidence,
                             file_path=str(path),
                             line_number=node.lineno,
-                            message=f"Dangerous function call: {call_name}",
-                            why_it_matters=(
-                                "This function can execute arbitrary code and "
-                                "is commonly abused by malware."
+                            message=f"Dangerous function call detected: {call_name}",
+                            why_it_matters=enrich_why_it_matters(
+                                Category.CODE_EXECUTION,
+                                "This call allows arbitrary system command execution."
                             ),
                             recommendation=(
-                                "Remove dynamic execution. If unavoidable, "
-                                "strictly validate inputs and isolate execution."
+                                "Remove dynamic execution. "
+                                "If unavoidable, sandbox execution and validate all inputs."
                             ),
                         )
                     )
@@ -122,7 +131,7 @@ class StaticCodeAnalyzer(Analyzer):
 
         return ""
 
-    # ---- FIXED TEST FILE DETECTION ----
+    # ---- TEST FILE DETECTION ----
     def _is_test_file(self, path: Path) -> bool:
         parts = {p.lower() for p in path.parts}
         filename = path.name.lower()

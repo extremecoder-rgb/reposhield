@@ -12,11 +12,11 @@ REPORT_VERSION = "1.0"
 
 def generate_report(report: ScanReport) -> Dict:
     """
-    Generate the final JSON-serializable report.
+    Generate the final JSON-serializable security report.
 
     Pipeline order (IMPORTANT):
-    1. Correlate related findings (boost confidence)
-    2. Suppress benign patterns (reduce confidence explicitly)
+    1. Correlate related findings (signal reinforcement)
+    2. Suppress explicitly benign patterns
     3. Calculate final risk score & verdict
     4. Add positive safety indicators
     """
@@ -52,13 +52,13 @@ def generate_report(report: ScanReport) -> Dict:
 def _generate_notes(verdict: str, findings: List[Finding]) -> List[str]:
     """
     Generate human-readable notes explaining
-    both risk and safety signals.
+    both detected risks and positive safety signals.
     """
 
     notes: List[str] = []
 
     if verdict == "SAFE":
-        # Positive reinforcement builds trust
+        # Explicit positive indicators build user trust
         notes.extend(positive_indicators(findings))
         notes.append("Continue following secure development practices.")
 
