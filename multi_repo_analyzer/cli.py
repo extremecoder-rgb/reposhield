@@ -77,13 +77,13 @@ def run_scan(path: str, output: str | None) -> None:
     )
 
     report_data = generate_report(scan_report)
-
     output_json = json.dumps(report_data, indent=2)
 
     if output:
         Path(output).write_text(output_json)
     else:
         print(output_json)
+        sys.stdout.flush()  # 🔥 CRITICAL FIX
 
     exit_code = _exit_code_from_verdict(report_data["risk"]["verdict"])
     sys.exit(exit_code)
