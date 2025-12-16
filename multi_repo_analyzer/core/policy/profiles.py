@@ -1,85 +1,91 @@
-from multi_repo_analyzer.core.policy.base import BasePolicy
-from multi_repo_analyzer.core.policy.decisions import (
-    PolicyDecision,
-    PolicyResult,
-)
+from multi_repo_analyzer.core.policy.result import PolicyResult
 
 
+class BasePolicy:
+    name: str = "base"
+
+    def evaluate(self, score: float, verdict: str) -> PolicyResult:
+        raise NotImplementedError
+
+
+# -------------------------
+# STANDARD POLICY
+# -------------------------
 class StandardPolicy(BasePolicy):
-    """
-    Balanced policy for most users.
-    """
-
     name = "standard"
 
+    BLOCK_SCORE = 70.0
+
     def evaluate(self, score: float, verdict: str) -> PolicyResult:
-        if verdict == "SAFE":
+        if score >= self.BLOCK_SCORE:
             return PolicyResult(
-                decision=PolicyDecision.ALLOW,
-                reason="No significant risk detected.",
+                policy_name=self.name,
+                decision="BLOCK",
+                reason="Risk score exceeds standard safety threshold",
             )
 
         if verdict == "CAUTION":
             return PolicyResult(
-                decision=PolicyDecision.WARN,
-                reason="Moderate risk detected. Review before proceeding.",
+                policy_name=self.name,
+                decision="WARN",
+                reason="Moderate risk detected under standard policy",
             )
 
         return PolicyResult(
-            decision=PolicyDecision.BLOCK,
-            reason="High-risk behavior detected.",
+            policy_name=self.name,
+            decision="ALLOW",
+            reason="Risk within acceptable limits",
         )
 
 
+# -------------------------
+# BEGINNER POLICY
+# -------------------------
 class BeginnerPolicy(BasePolicy):
-    """
-    More conservative policy for less-experienced developers.
-    """
-
     name = "beginner"
 
+    BLOCK_SCORE = 60.0
+
     def evaluate(self, score: float, verdict: str) -> PolicyResult:
-        if verdict == "SAFE":
+        if score >= self.BLOCK_SCORE:
             return PolicyResult(
-                decision=PolicyDecision.ALLOW,
-                reason="Repository appears safe.",
+                policy_name=self.name,
+                decision="BLOCK",
+                reason="Risk score exceeds beginner safety threshold",
             )
 
         if verdict == "CAUTION":
             return PolicyResult(
-                decision=PolicyDecision.WARN,
-                reason=(
-                    "Potential risk detected. Beginners should proceed "
-                    "only if the source is trusted."
-                ),
+                policy_name=self.name,
+                decision="WARN",
+                reason="Potential risks detected under beginner policy",
             )
 
         return PolicyResult(
-            decision=PolicyDecision.BLOCK,
-            reason=(
-                "High-risk patterns detected. Blocking to protect "
-                "inexperienced users."
-            ),
+            policy_name=self.name,
+            decision="ALLOW",
+            reason="Risk within acceptable limits",
         )
 
 
+# -------------------------
+# ZERO-TRUST POLICY
+# -------------------------
 class ZeroTrustPolicy(BasePolicy):
-    """
-    Strictest policy — deny by default.
-    """
-
     name = "zero-trust"
 
+    BLOCK_SCORE = 40.0
+
     def evaluate(self, score: float, verdict: str) -> PolicyResult:
-        if verdict == "SAFE":
+        if score >= self.BLOCK_SCORE:
             return PolicyResult(
-                decision=PolicyDecision.ALLOW,
-                reason="No risk signals detected.",
+                policy_name=self.name,
+                decision="BLOCK",
+                reason="Zero-trust policy blocks elevated risk by default",
             )
 
         return PolicyResult(
-            decision=PolicyDecision.BLOCK,
-            reason=(
-                "Zero-Trust policy blocks all non-safe repositories."
-            ),
+            policy_name=self.name,
+            decision="WARN",
+            reason="Zero-trust policy warns even for low risk",
         )
