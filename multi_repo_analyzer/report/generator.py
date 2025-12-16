@@ -5,6 +5,7 @@ from multi_repo_analyzer.core.scoring import calculate_risk
 from multi_repo_analyzer.core.correlation import correlate_findings
 from multi_repo_analyzer.core.suppression import suppress_benign_patterns
 from multi_repo_analyzer.core.positives import positive_indicators
+from multi_repo_analyzer.core.policy.result import PolicyResult
 
 
 REPORT_VERSION = "1.0"
@@ -13,6 +14,7 @@ REPORT_VERSION = "1.0"
 def generate_report(
     report: ScanReport,
     rule_metrics: Dict | None = None,
+    policy_result: PolicyResult | None = None,
 ) -> Dict:
     """
     Generate the final JSON-serializable security report.
@@ -23,7 +25,7 @@ def generate_report(
 
     score, verdict = calculate_risk(final_findings)
 
-    return {
+    output = {
         "version": REPORT_VERSION,
         "tool": {
             "name": report.tool_name,
@@ -41,6 +43,16 @@ def generate_report(
         "notes": _generate_notes(verdict, final_findings),
         "rule_metrics": rule_metrics or {},
     }
+
+    # 🔐 Policy-aware reporting (Step 6)
+    if policy_result:
+        output["policy"] = {
+            "name": policy_result.policy_name,
+            "decision": policy_result.decision,
+            "reason": policy_result.reason,
+        }
+
+    return output
 
 
 def _generate_notes(verdict: str, findings: List[Finding]) -> List[str]:

@@ -102,6 +102,7 @@ def run_scan(
         findings=findings,
     )
 
+    # 🔍 Generate base report (risk + findings)
     report_data = generate_report(scan_report)
 
     # 🔐 POLICY EVALUATION
@@ -111,14 +112,34 @@ def run_scan(
         verdict=report_data["risk"]["verdict"],
     )
 
-    # 🛡️ GUARD MODE (SIMULATED)
+    # 📄 Re-generate report WITH policy decision embedded
+    report_data = generate_report(
+        scan_report,
+        policy_result=policy_result,
+    )
+
+    # 📧 SIMULATED ALERTING (STEP 7)
+    if policy_result.decision == "BLOCK":
+        print("\n📧 SECURITY ALERT (SIMULATION)")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"Policy: {policy_result.policy_name}")
+        print(f"Decision: {policy_result.decision}")
+        print(f"Reason: {policy_result.reason}")
+        print(f"Repository: {repo_path}")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+
+    elif policy_result.decision == "WARN":
+        print("\n⚠️ SECURITY NOTICE (SIMULATION)")
+        print(f"Policy: {policy_result.policy_name}")
+        print(f"Reason: {policy_result.reason}\n")
+
+    # 🛡️ GUARD MODE (SIMULATED BLOCKING)
     if guard_mode and policy_result.decision == "BLOCK":
-        print("\n🚨 THREAT DETECTED")
+        print("🚨 THREAT DETECTED")
         print("❌ Operation BLOCKED (simulation)")
-        print(f"📜 Policy: {policy_name}")
+        print(f"📜 Policy: {policy_result.policy_name}")
         print(f"🧠 Reason: {policy_result.reason}")
         print("📘 Review the report before proceeding.\n")
-
         sys.exit(2)
 
     output_json = json.dumps(report_data, indent=2)
