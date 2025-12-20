@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import argparse
 import json
 import sys
@@ -16,6 +19,13 @@ from multi_repo_analyzer.analyzer.dependencies import DependencyAnalyzer
 from multi_repo_analyzer.analyzer.cicd import CICDAnalyzer
 
 from multi_repo_analyzer.core.policy.engine import PolicyEngine
+
+# 🔵 AI imports (Phase 4)
+from multi_repo_analyzer.core.ai.context_builder import build_ai_context
+from multi_repo_analyzer.core.ai.client import GeminiClient
+from multi_repo_analyzer.core.ai.education import generate_education_for_findings
+from multi_repo_analyzer.core.ai.safety import sanitize_ai_output
+from multi_repo_analyzer.core.ai.errors import AIUnavailableError
 
 
 TOOL_NAME = "multi-repo-analyzer"
@@ -46,6 +56,12 @@ def main() -> None:
     )
 
     scan_parser.add_argument(
+        "--explain",
+        action="store_true",
+        help="Generate AI explanations (optional, advisory only)",
+    )
+
+    scan_parser.add_argument(
         "--output",
         help="Write report to file instead of stdout",
     )
@@ -57,6 +73,7 @@ def main() -> None:
             path=args.path,
             policy_name=args.policy,
             guard_mode=args.guard,
+            explain=args.explain,
             output=args.output,
         )
 
@@ -65,6 +82,7 @@ def run_scan(
     path: str,
     policy_name: str,
     guard_mode: bool,
+    explain: bool,
     output: str | None,
 ) -> None:
     repo_path = Path(path).resolve()
@@ -102,44 +120,59 @@ def run_scan(
         findings=findings,
     )
 
-    # 🔍 Generate base report (risk + findings)
+    # 🔍 Base report
     report_data = generate_report(scan_report)
 
-    # 🔐 POLICY EVALUATION
+    # 🔐 Policy evaluation
     policy_engine = PolicyEngine(policy_name)
     policy_result = policy_engine.evaluate(
         score=report_data["risk"]["score"],
         verdict=report_data["risk"]["verdict"],
     )
 
-    # 📄 Re-generate report WITH policy decision embedded
     report_data = generate_report(
         scan_report,
         policy_result=policy_result,
     )
 
-    # 📧 SIMULATED ALERTING (STEP 7)
+    # 🟢 PHASE 4 — AI EXPLAINABILITY (OPTIONAL)
+    if explain:
+        try:
+            ai_context = build_ai_context(report_data)
+            client = GeminiClient()
+
+            education = generate_education_for_findings(
+                context=ai_context,
+                llm_client=client,
+            )
+
+            report_data["ai"] = {
+                "education": {
+                    fid: sanitize_ai_output(text)
+                    for fid, text in education.items()
+                }
+            }
+
+        except AIUnavailableError:
+            report_data["ai"] = {
+                "error": "AI explanations unavailable. Core scan unaffected."
+            }
+
+        except Exception:
+            report_data["ai"] = {
+                "error": "AI explanation failed safely. Core scan unaffected."
+            }
+
+    # 📧 Simulated alerting
     if policy_result.decision == "BLOCK":
         print("\n📧 SECURITY ALERT (SIMULATION)")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"Policy: {policy_result.policy_name}")
-        print(f"Decision: {policy_result.decision}")
-        print(f"Reason: {policy_result.reason}")
-        print(f"Repository: {repo_path}")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-    elif policy_result.decision == "WARN":
-        print("\n⚠️ SECURITY NOTICE (SIMULATION)")
         print(f"Policy: {policy_result.policy_name}")
         print(f"Reason: {policy_result.reason}\n")
 
-    # 🛡️ GUARD MODE (SIMULATED BLOCKING)
+    # 🛡️ Guard mode
     if guard_mode and policy_result.decision == "BLOCK":
         print("🚨 THREAT DETECTED")
         print("❌ Operation BLOCKED (simulation)")
-        print(f"📜 Policy: {policy_result.policy_name}")
-        print(f"🧠 Reason: {policy_result.reason}")
-        print("📘 Review the report before proceeding.\n")
         sys.exit(2)
 
     output_json = json.dumps(report_data, indent=2)

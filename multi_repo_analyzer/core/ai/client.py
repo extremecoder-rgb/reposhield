@@ -6,7 +6,6 @@ import os
 import logging
 from typing import Optional
 
-from multi_repo_analyzer.core.ai.contract import AIContext
 from multi_repo_analyzer.core.ai.errors import AIUnavailableError
 
 logger = logging.getLogger(__name__)
@@ -31,16 +30,18 @@ class GeminiClient:
                 "GEMINI_API_KEY not set. AI features are disabled."
             )
 
-        # Lazy import to avoid hard dependency when AI is disabled
+        # ✅ NEW SDK (google.genai)
         try:
-            import google.generativeai as genai
+            from google import genai
         except ImportError as exc:
             raise AIUnavailableError(
-                "Gemini SDK not installed."
+                "google-genai SDK not installed."
             ) from exc
 
-        genai.configure(api_key=self.api_key)
-        self._model = genai.GenerativeModel("gemini-pro")
+        self._client = genai.Client(api_key=self.api_key)
+
+        # ✅ Use a CURRENT, supported model
+        self._model_name = "models/gemini-2.5-flash"
 
     def generate(self, prompt: str) -> Optional[str]:
         """
@@ -51,9 +52,9 @@ class GeminiClient:
             None on failure
         """
         try:
-            response = self._model.generate_content(
-                prompt,
-                request_options={"timeout": self.timeout},
+            response = self._client.models.generate_content(
+                model=self._model_name,
+                contents=prompt,
             )
 
             if not response or not response.text:
