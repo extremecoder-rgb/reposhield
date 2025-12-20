@@ -1,32 +1,63 @@
+# core/ai/explain.py
 # Purpose:
-# Convert scan results into AI-generated explanations.
-# This module must NEVER affect scan outcomes.
-
-from typing import Optional
+# Generate human-readable explanations using Gemini
+# without affecting detection or decisions.
 
 from multi_repo_analyzer.core.ai.client import GeminiClient
-from multi_repo_analyzer.core.ai.contract import AIContext
-from multi_repo_analyzer.core.ai.prompts import explanation_prompt
-from multi_repo_analyzer.core.ai.context_builder import sanitize_ai_output
+from multi_repo_analyzer.core.ai.context_builder import build_ai_context
+from multi_repo_analyzer.core.ai.output_sanitizer import sanitize_ai_output
 
 
-def generate_explanation(context: AIContext) -> Optional[str]:
+SYSTEM_PROMPT = """
+You are a security assistant.
+Your role is to EXPLAIN findings clearly and cautiously.
+
+Rules:
+- Do NOT claim malware.
+- Do NOT introduce new risks.
+- Do NOT suggest commands or actions.
+- Base explanations ONLY on the provided findings.
+- If unsure, say so explicitly.
+"""
+
+
+def explain_report(report_data: dict) -> str:
     """
-    Generate a human-readable explanation of scan results.
-
-    Returns:
-        AI explanation string or None if unavailable.
+    Generate a plain-English explanation of scan results.
     """
+
+    ai_context = build_ai_context(report_data)
+
+    prompt = f"""
+Scan verdict: {ai_context.verdict}
+Risk score: {ai_context.risk_score}
+
+Findings:
+{_format_findings(ai_context.findings)}
+
+Explain:
+- Why these findings may be risky
+- In beginner-friendly language
+- Without speculation
+"""
+
+    client = GeminiClient()
+
     try:
-        client = GeminiClient()
+        raw_response = client.generate(
+            system_prompt=SYSTEM_PROMPT,
+            user_prompt=prompt,
+        )
     except Exception:
-        # AI unavailable — silently skip
-        return None
+        return "AI explanation unavailable. Scan results are unaffected."
 
-    prompt = explanation_prompt(context.summary())
+    return sanitize_ai_output(raw_response)
 
-    raw_output = client.generate(prompt)
-    if not raw_output:
-        return None
 
-    return sanitize_ai_output(raw_output)
+def _format_findings(findings) -> str:
+    lines = []
+    for f in findings:
+        lines.append(
+            f"- [{f.severity.upper()}] {f.category}: {f.message}"
+        )
+    return "\n".join(lines)
