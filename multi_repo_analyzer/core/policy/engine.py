@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Dict, Type, List
 
 from multi_repo_analyzer.core.policy.base import BasePolicy
 from multi_repo_analyzer.core.policy.decisions import PolicyResult
@@ -30,8 +30,17 @@ class PolicyEngine:
         self.policy_name = policy_name
         self.policy = self._POLICIES[policy_name]()
 
-    def evaluate(self, score: float, verdict: str) -> PolicyResult:
+    def evaluate(
+        self,
+        score: float,
+        verdict: str,
+        findings: List[dict] | None = None,
+    ) -> PolicyResult:
         """
         Evaluate scan outcome against selected policy.
         """
-        return self.policy.evaluate(score=score, verdict=verdict)
+        return self.policy.evaluate(
+            score=score,
+            verdict=verdict,
+            findings=findings,
+        )

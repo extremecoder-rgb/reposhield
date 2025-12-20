@@ -1,24 +1,13 @@
-# Purpose:
-# API route definitions.
-# This layer handles HTTP concerns only (validation, responses).
-# NO scanning logic here.
-
 from flask import Blueprint, jsonify, request
-import re
+
+from multi_repo_analyzer.service.scan_service import scan_github_repository
+from multi_repo_analyzer.service.github import GitHubCloneError
 
 api_bp = Blueprint("api", __name__)
-
-# Simple GitHub repo URL pattern (public repos only)
-GITHUB_REPO_PATTERN = re.compile(
-    r"^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?$"
-)
 
 
 @api_bp.route("/health", methods=["GET"])
 def health_check():
-    """
-    Health check endpoint.
-    """
     return jsonify(
         {
             "status": "ok",
@@ -29,11 +18,6 @@ def health_check():
 
 @api_bp.route("/scan", methods=["POST"])
 def scan_repository():
-    """
-    Accept a GitHub repository URL and validate input.
-
-    This endpoint DOES NOT perform scanning yet.
-    """
     if not request.is_json:
         return jsonify(
             {
@@ -52,28 +36,26 @@ def scan_repository():
         ), 400
 
     repo_url = data["repo_url"]
+    policy = data.get("policy", "standard")
 
-    if not isinstance(repo_url, str):
+    try:
+        report = scan_github_repository(
+            repo_url=repo_url,
+            policy_name=policy,
+        )
+    except GitHubCloneError as exc:
         return jsonify(
             {
-                "error": "Invalid request",
-                "message": "'repo_url' must be a string",
+                "error": "Clone failed",
+                "message": str(exc),
             }
         ), 400
-
-    if not GITHUB_REPO_PATTERN.match(repo_url):
+    except Exception as exc:
         return jsonify(
             {
-                "error": "Invalid repository URL",
-                "message": "Only public GitHub repository URLs are supported",
+                "error": "Scan failed",
+                "message": str(exc),
             }
-        ), 400
+        ), 500
 
-    # ✅ Stub response (no scanning yet)
-    return jsonify(
-        {
-            "status": "accepted",
-            "repo_url": repo_url,
-            "message": "Repository URL accepted for scanning",
-        }
-    ), 202
+    return jsonify(report), 200

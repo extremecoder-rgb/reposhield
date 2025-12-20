@@ -1,21 +1,4 @@
-# multi_repo_analyzer/service/scan_service.py
-#
-# Purpose:
-# Orchestrate a full GitHub repository scan using the existing engine.
-#
-# This is the glue layer between:
-# - GitHub URL input
-# - Temporary workspace
-# - Core scan engine
-# - JSON report output
-#
-# SECURITY:
-# - No engine changes
-# - No execution
-# - Automatic cleanup
-
-from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 from multi_repo_analyzer.service.workspace import temporary_workspace
 from multi_repo_analyzer.service.github import clone_public_repo, GitHubCloneError
@@ -36,36 +19,46 @@ from multi_repo_analyzer.core.policy.engine import PolicyEngine
 
 
 class ServiceScanError(Exception):
-    """Raised when the service-level scan fails."""
+    pass
+
+
+def _build_practical_explanations(report_data: Dict) -> List[Dict]:
+    """
+    Build practical, file-level explanations from findings.
+    NO AI RAMBLING.
+    """
+    explanations = []
+
+    for f in report_data.get("findings", []):
+        explanations.append(
+            {
+                "file": f.get("file_path"),
+                "issue": f.get("category"),
+                "severity": f.get("severity"),
+                "pattern": f.get("message"),
+                "why_risky": f.get("why_it_matters"),
+                "impact": f.get("recommendation"),
+            }
+        )
+
+    return explanations
 
 
 def scan_github_repository(
     repo_url: str,
     policy_name: str = "standard",
 ) -> Dict:
-    """
-    Scan a public GitHub repository and return a JSON report.
-
-    This function is SAFE to expose via API.
-    """
 
     with temporary_workspace() as workspace:
         try:
-            repo_path = clone_public_repo(
-                repo_url=repo_url,
-                destination=workspace,
-            )
+            repo_path = clone_public_repo(repo_url, workspace)
         except GitHubCloneError as exc:
             raise ServiceScanError(str(exc))
 
-        # 🛡️ Safety guard
         guard = ScanGuard(max_files=10_000)
 
         try:
-            files_by_language = walk_repository(
-                repo_path,
-                guard=guard,
-            )
+            files_by_language = walk_repository(repo_path, guard=guard)
         except ScanLimitExceeded as exc:
             raise ServiceScanError(f"Scan aborted: {exc}")
 
@@ -75,7 +68,6 @@ def scan_github_repository(
             max_file_size=1_000_000,
         )
 
-        # 🔍 Run analyzers (unchanged)
         registry = AnalyzerRegistry()
         registry.register(StaticCodeAnalyzer())
         registry.register(ObfuscationAnalyzer())
@@ -92,20 +84,27 @@ def scan_github_repository(
             findings=findings,
         )
 
-        # 📄 Base report
         report_data = generate_report(scan_report)
 
-        # 🔐 Policy evaluation
         policy_engine = PolicyEngine(policy_name)
         policy_result = policy_engine.evaluate(
             score=report_data["risk"]["score"],
             verdict=report_data["risk"]["verdict"],
+            findings=report_data.get("findings", []),
         )
 
-        # Embed policy into report
+
         report_data = generate_report(
             scan_report,
             policy_result=policy_result,
         )
+
+        # ✅ PRACTICAL EXPLANATIONS (WHAT YOU WANT)
+        practical = _build_practical_explanations(report_data)
+
+        if practical:
+            report_data["ai"] = {
+                "explanation": practical
+            }
 
         return report_data

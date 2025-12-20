@@ -26,24 +26,28 @@ NORMALIZATION_FACTOR = 7.5
 
 def calculate_risk(findings: List[Finding]) -> Tuple[float, str]:
     """
-    Calculate calibrated risk score and verdict.
+    Calculate calibrated risk score and behavior-aware verdict.
 
-    Phase 2 goals:
-    - Low confidence is penalized
-    - Correlated findings accumulate
-    - No single finding dominates
+    Key rules:
+    - Score reflects quantity and confidence
+    - Verdict reflects *dangerous behavior*
     """
 
     total_score = 0.0
+    has_execution = False
 
     for finding in findings:
         if finding.severity is None or finding.category is None:
             continue
 
+        # Track dangerous behavior
+        if finding.category == Category.CODE_EXECUTION:
+            has_execution = True
+
         severity_weight = SEVERITY_WEIGHTS.get(finding.severity, 1.0)
         category_weight = CATEGORY_WEIGHTS.get(finding.category, 1.0)
 
-        # Confidence penalty (important)
+        # Confidence penalty (squared = strong dampening)
         confidence_factor = finding.confidence ** 2
 
         raw_score = (
@@ -58,14 +62,23 @@ def calculate_risk(findings: List[Finding]) -> Tuple[float, str]:
     normalized = min(total_score * NORMALIZATION_FACTOR, 100.0)
     normalized = round(normalized, 2)
 
-    verdict = _map_verdict(normalized)
+    verdict = _map_verdict(normalized, has_execution)
     return normalized, verdict
 
 
-def _map_verdict(score: float) -> str:
-    # 🔧 FINAL calibrated thresholds
-    if score < 20:
-        return "SAFE"
-    if score < 40:
+def _map_verdict(score: float, has_execution: bool) -> str:
+    """
+    Verdict is behavior-first, score-second.
+    """
+
+    # 🚨 Only execution-capable repos can be RISKY
+    if has_execution:
+        if score >= 40:
+            return "RISKY"
         return "CAUTION"
-    return "RISKY"
+
+    # 🧠 No execution = informational risk only
+    if score < 30:
+        return "SAFE"
+
+    return "CAUTION"

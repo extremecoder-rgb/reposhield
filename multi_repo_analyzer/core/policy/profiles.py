@@ -1,91 +1,134 @@
 from multi_repo_analyzer.core.policy.result import PolicyResult
 
 
+# -------------------------
+# POLICY BASE
+# -------------------------
 class BasePolicy:
     name: str = "base"
 
-    def evaluate(self, score: float, verdict: str) -> PolicyResult:
+    def evaluate(self, score: float, verdict: str, findings=None) -> PolicyResult:
         raise NotImplementedError
 
 
 # -------------------------
-# STANDARD POLICY
+# HELPER LOGIC (IMPORTANT)
+# -------------------------
+def has_dangerous_execution(findings) -> bool:
+    """
+    Hard blockers:
+    - dynamic execution
+    - os.system / eval / subprocess
+    - decode + execute patterns
+    """
+    if not findings:
+        return False
+
+    dangerous_categories = {
+        "code_execution",
+        "command_execution",
+        "dynamic_execution",
+    }
+
+    dangerous_patterns = {
+        "os.system",
+        "eval",
+        "exec",
+        "subprocess",
+        "decode and execute",
+    }
+
+    for f in findings:
+        category = f.get("category", "").lower()
+        message = f.get("message", "").lower()
+
+        if category in dangerous_categories:
+            return True
+
+        if any(p in message for p in dangerous_patterns):
+            return True
+
+    return False
+
+
+def only_entropy_or_obfuscation(findings) -> bool:
+    """
+    Detect benign frontend noise:
+    - high entropy
+    - obfuscation
+    - secrets WITHOUT execution
+    """
+    if not findings:
+        return True
+
+    allowed_categories = {
+        "obfuscation",
+        "secrets",
+    }
+
+    for f in findings:
+        if f.get("category") not in allowed_categories:
+            return False
+
+    return True
+
+
+# -------------------------
+# STANDARD POLICY (FIXED)
 # -------------------------
 class StandardPolicy(BasePolicy):
     name = "standard"
 
     BLOCK_SCORE = 70.0
 
-    def evaluate(self, score: float, verdict: str) -> PolicyResult:
-        if score >= self.BLOCK_SCORE:
+    def evaluate(self, score: float, verdict: str, findings=None) -> PolicyResult:
+        # 🚨 BLOCK ONLY IF DANGEROUS BEHAVIOR EXISTS
+        if has_dangerous_execution(findings):
             return PolicyResult(
                 policy_name=self.name,
                 decision="BLOCK",
-                reason="Risk score exceeds standard safety threshold",
+                reason="Dangerous code execution patterns detected",
             )
 
-        if verdict == "CAUTION":
+        # ⚠️ HIGH SCORE BUT NO EXECUTION → WARN
+        if score >= self.BLOCK_SCORE:
             return PolicyResult(
                 policy_name=self.name,
                 decision="WARN",
-                reason="Moderate risk detected under standard policy",
+                reason="High risk score due to multiple weak signals",
             )
 
         return PolicyResult(
             policy_name=self.name,
             decision="ALLOW",
-            reason="Risk within acceptable limits",
+            reason="No dangerous execution behavior detected",
         )
 
 
 # -------------------------
 # BEGINNER POLICY
 # -------------------------
-class BeginnerPolicy(BasePolicy):
+class BeginnerPolicy(StandardPolicy):
     name = "beginner"
-
     BLOCK_SCORE = 60.0
-
-    def evaluate(self, score: float, verdict: str) -> PolicyResult:
-        if score >= self.BLOCK_SCORE:
-            return PolicyResult(
-                policy_name=self.name,
-                decision="BLOCK",
-                reason="Risk score exceeds beginner safety threshold",
-            )
-
-        if verdict == "CAUTION":
-            return PolicyResult(
-                policy_name=self.name,
-                decision="WARN",
-                reason="Potential risks detected under beginner policy",
-            )
-
-        return PolicyResult(
-            policy_name=self.name,
-            decision="ALLOW",
-            reason="Risk within acceptable limits",
-        )
 
 
 # -------------------------
-# ZERO-TRUST POLICY
+# ZERO TRUST POLICY
 # -------------------------
 class ZeroTrustPolicy(BasePolicy):
     name = "zero-trust"
 
-    BLOCK_SCORE = 40.0
-
-    def evaluate(self, score: float, verdict: str) -> PolicyResult:
-        if score >= self.BLOCK_SCORE:
+    def evaluate(self, score: float, verdict: str, findings=None) -> PolicyResult:
+        if has_dangerous_execution(findings):
             return PolicyResult(
                 policy_name=self.name,
                 decision="BLOCK",
-                reason="Zero-trust policy blocks elevated risk by default",
+                reason="Zero-trust policy blocks dangerous execution",
             )
 
         return PolicyResult(
             policy_name=self.name,
             decision="WARN",
-            reason="Zero-trust policy warns even for low risk",
+            reason="Zero-trust policy warns even without execution",
         )
