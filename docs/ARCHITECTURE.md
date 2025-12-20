@@ -39,3 +39,19 @@ All findings are immutable facts.
 Post-processing (correlation, suppression) produces new findings.
 
 This prevents analyzers from influencing final risk directly.
+
+## AI Boundary Contract
+
+The Gemini LLM is used strictly as an explainability layer.
+
+The AI model:
+- Never receives raw source code
+- Never receives secrets or credentials
+- Never receives file contents
+- Never participates in detection, scoring, or policy decisions
+
+All AI input is derived exclusively from the final JSON report
+produced by the static analysis engine.
+
+AI output is advisory only and cannot alter scan results.
+
