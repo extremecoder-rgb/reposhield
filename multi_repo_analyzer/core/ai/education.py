@@ -10,43 +10,8 @@
 
 from typing import Dict, Optional
 
-from multi_repo_analyzer.core.ai.contract import AIContext, AIFinding
-
-
-SYSTEM_PROMPT = """
-You are a security educator.
-
-RULES:
-- Explain concepts clearly for beginners.
-- Do NOT invent threats or vulnerabilities.
-- Do NOT provide attack steps or commands.
-- Do NOT declare anything as malware.
-- Use neutral, educational language.
-- If information is insufficient, say so.
-"""
-
-
-def _build_education_prompt(finding: AIFinding) -> str:
-    return f"""
-Finding Type: {finding.category}
-Severity: {finding.severity}
-Confidence: {finding.confidence}
-
-Finding Description:
-{finding.message}
-
-Why It Matters:
-{finding.why_it_matters}
-
-Task:
-Explain the following in a safe, educational way:
-
-1. What this security pattern is
-2. How attackers commonly abuse it
-3. How developers can avoid or mitigate it
-
-Use short paragraphs. Avoid speculation.
-"""
+from multi_repo_analyzer.core.ai.contract import AIContext
+from multi_repo_analyzer.core.ai.prompts import education_prompt
 
 
 def generate_education_for_findings(
@@ -63,11 +28,17 @@ def generate_education_for_findings(
     explanations: Dict[str, str] = {}
 
     for finding in context.findings:
-        prompt = _build_education_prompt(finding)
+        prompt = education_prompt(
+            category=finding.category,
+            severity=finding.severity,
+            confidence=finding.confidence,
+            message=finding.message,
+            why_it_matters=finding.why_it_matters,
+        )
 
         try:
             response: Optional[str] = llm_client.generate_text(
-                system_prompt=SYSTEM_PROMPT,
+                system_prompt=None,  # already embedded in prompt
                 user_prompt=prompt,
                 max_tokens=300,
             )
