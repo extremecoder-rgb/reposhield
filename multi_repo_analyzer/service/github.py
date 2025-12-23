@@ -39,7 +39,7 @@ def validate_github_url(url: str) -> None:
 def clone_public_repo(
     repo_url: str,
     destination: Path,
-    timeout_seconds: int = 30,
+    timeout_seconds: int = 300,
 ) -> Path:
     """
     Clone a public GitHub repository into destination.

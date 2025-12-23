@@ -52,7 +52,7 @@ def clone_public_repo(repo_url: str) -> Path:
             ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
-            timeout=60,
+            timeout=300,
             check=False,
         )
 
