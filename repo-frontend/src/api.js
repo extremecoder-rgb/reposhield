@@ -1,4 +1,5 @@
-const API_BASE = "http://127.0.0.1:8000";
+// Use environment variable for API base, fallback to local for development
+const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export async function scanRepository(repoUrl) {
   const res = await fetch(`${API_BASE}/scan`, {
@@ -12,8 +13,14 @@ export async function scanRepository(repoUrl) {
   });
 
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Scan failed");
+    let errorMessage = "Scan failed";
+    try {
+      const err = await res.json();
+      errorMessage = err.message || errorMessage;
+    } catch (e) {
+      // Fallback if response is not JSON
+    }
+    throw new Error(errorMessage);
   }
 
   return res.json();
