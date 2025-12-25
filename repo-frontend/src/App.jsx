@@ -1,204 +1,341 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   ShieldCheck,
   ShieldAlert,
   Loader2,
-  Github,
   FileWarning,
+  ArrowLeft,
+  ChevronRight,
+  Shield,
+  Zap,
 } from "lucide-react";
 import { scanRepository } from "./api";
+import logoImg from "./assets/logo.png";
+import handImg from "./assets/real.png";
+
+const LOADING_STEPS = [
+  "ACCESSING GITHUB REPOSITORY...",
+  "CLONING SOURCE CODE...",
+  "INITIALIZING SECURITY ENGINE...",
+  "ANALYZING STATIC PATTERNS...",
+  "CHECKING FOR OBFUSCATION...",
+  "SCANNING FOR EXPOSED SECRETS...",
+  "CRUNCHING DATA...",
+  "GENERATING FINAL REPORT...",
+];
 
 export default function App() {
   const [repoUrl, setRepoUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [report, setReport] = useState(null);
   const [error, setError] = useState(null);
+  const [view, setView] = useState("landing"); // 'landing' or 'results'
+
+  // Cycle through loading steps
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingStep((prev) => (prev + 1) % LOADING_STEPS.length);
+      }, 1200);
+    } else {
+      setLoadingStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   async function handleScan(e) {
-    e.preventDefault();
-    if (!repoUrl) return;
+    if (e) e.preventDefault();
+    console.log("Scan initiated for:", repoUrl);
+    
+    if (!repoUrl) {
+      console.warn("No repo URL provided");
+      return;
+    }
 
     setLoading(true);
     setError(null);
-    setReport(null);
 
     try {
+      console.log("Calling scanRepository API...");
       const data = await scanRepository(repoUrl);
+      console.log("Scan successful, data received:", data);
+      
+      if (!data) {
+        throw new Error("Empty response from server");
+      }
+
       setReport(data);
+      
+      // Brief delay to show finished status before switching view
+      setTimeout(() => {
+        setLoading(false);
+        setView("results");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        console.log("Switching to results view");
+      }, 1000);
     } catch (err) {
-      setError(err.message || "Scan failed");
-    } finally {
+      console.error("Scan failed error:", err);
+      setError(err.message || "Scan failed. Please check if the backend is running.");
       setLoading(false);
     }
   }
 
+  const resetScanner = () => {
+    setReport(null);
+    setRepoUrl("");
+    setView("landing");
+    setError(null);
+  };
+
+  if (view === "results" && report) {
+    return (
+      <ResultsPage
+        report={report}
+        onBack={resetScanner}
+        repoUrl={repoUrl}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8">
-        {/* Header */}
-        <div className="flex flex-col items-center text-center gap-3 mb-8">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-7 h-7 text-emerald-600" />
-            <h1 className="text-3xl font-bold text-gray-900">
-              Repository Security Scanner
-            </h1>
+    <>
+      <div className="page-bg"></div>
+
+      <section className="hero">
+        <div className="hero-glass">
+          <header className="navbar">
+            <div className="logo" onClick={resetScanner} style={{ cursor: 'pointer' }}>
+              <img src={logoImg} alt="RepoShield" />
+              <span>REPOSHIELD</span>
+            </div>
+
+            <nav>
+              <a href="#">HOME</a>
+              <a href="#">RECORDS</a>
+              <a href="#">HOW IT WORKS</a>
+              <a href="#">CONTACT</a>
+            </nav>
+
+            <button className="signup-btn">SIGN UP</button>
+          </header>
+
+          <h1>
+            VERIFY BEFORE YOU
+            <br />
+            CLONE.
+          </h1>
+
+          <p>
+            AUTOMATED SECURITY SCANNING FOR GITHUB
+            <br />
+            REPOSITORIES—BEFORE CODE REACHES YOUR SYSTEM.
+          </p>
+
+          <div className="search-box-container">
+            <form 
+              onSubmit={handleScan} 
+              className={`search-box ${loading ? 'scanning' : ''}`}
+            >
+              <input
+                type="text"
+                placeholder="Paste your GitHub repository link here..."
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                disabled={loading}
+              />
+              <div className={`progress-container ${loading ? 'active' : ''}`}>
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${((loadingStep + 1) / LOADING_STEPS.length) * 100}%` }}
+                ></div>
+              </div>
+              <button 
+                className={`search-btn ${loading ? 'scanning' : ''}`} 
+                type="submit"
+                disabled={loading || !repoUrl}
+              >
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <ChevronRight className="w-6 h-6" />
+                )}
+              </button>
+            </form>
+
+            {loading && (
+              <div className="scanning-feedback">
+                <div className="scanner-dots">
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                </div>
+                <div className="scanning-text">
+                  {LOADING_STEPS[loadingStep]}
+                </div>
+              </div>
+            )}
           </div>
-          <p className="text-gray-600 max-w-md">
-            Analyze GitHub repositories for potential security risks and unsafe
-            patterns.
+
+          <small>
+            By using our service you are accepting our{" "}
+            <a href="#">terms of service</a>.
+          </small>
+
+          {error && (
+            <p style={{ marginTop: "30px", color: "#ff8888", fontSize: "14px", fontWeight: "500", background: 'rgba(255,0,0,0.1)', padding: '10px 20px', borderRadius: '10px' }}>
+              ⚠️ {error}
+            </p>
+          )}
+        </div>
+      </section>
+
+      <div className="hand-wrapper">
+        <img src={handImg} className="hand-image" alt="Human & AI Hand" />
+      </div>
+
+      <section className="features">
+        <div className="feature-card">
+          <div className="icon">🛡️</div>
+          <h3>PROACTIVE PROTECTION</h3>
+          <p style={{ marginTop: '15px' }}>
+            Continuously protects your development workflow from malicious and
+            insecure open-source code.
           </p>
         </div>
 
-        {/* Input */}
-        <form
-          onSubmit={handleScan}
-          className="flex flex-col sm:flex-row gap-3"
-        >
-          <div className="relative flex-1">
-            <Github className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="https://github.com/user/repository"
-              className="w-full h-11 border border-gray-300 rounded-lg pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-black"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-            />
-          </div>
+        <div className="feature-card">
+          <div className="icon">🔒</div>
+          <h3>PRE-FLIGHT BLOCKING</h3>
+          <p style={{ marginTop: '15px' }}>Blocks unsafe repositories before they ever touch your local file system.</p>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-11 inline-flex items-center justify-center gap-2 bg-black text-white px-6 rounded-lg hover:bg-gray-800 disabled:opacity-50"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Scanning
-              </>
-            ) : (
-              <>
-                <Search className="w-4 h-4" />
-                Scan
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Error */}
-        {error && (
-          <p className="mt-4 text-sm text-center text-red-600">
-            {error}
+        <div className="feature-card">
+          <div className="icon">📄</div>
+          <h3>DEEP ANALYSIS</h3>
+          <p style={{ marginTop: '15px' }}>
+            Actionable security report highlighting risks, affected files, and
+            recommended fixes.
           </p>
-        )}
+        </div>
+      </section>
 
-        {/* Loading */}
-        {loading && (
-          <div className="mt-6 flex flex-col items-center gap-2 text-gray-600">
-            <Loader2 className="w-6 h-6 animate-spin" />
-            <p>Scanning repository…</p>
-          </div>
-        )}
-
-        {/* Result */}
-        {report && <ResultView report={report} />}
-      </div>
-    </div>
+      <section className="tagline">
+        <h2>Security you can trust, before you run the code.</h2>
+      </section>
+    </>
   );
 }
 
-function ResultView({ report }) {
+function ResultsPage({ report, onBack, repoUrl }) {
   const { risk, policy, ai } = report;
   const isSafe = risk.verdict === "SAFE";
 
   return (
-    <div className="mt-8">
-      {/* Verdict */}
-      <div
-        className={`flex gap-3 p-5 rounded-xl ${
-          isSafe ? "bg-emerald-50" : "bg-red-50"
-        }`}
-      >
-        {isSafe ? (
-          <ShieldCheck className="w-6 h-6 text-emerald-600" />
-        ) : (
-          <ShieldAlert className="w-6 h-6 text-red-600" />
-        )}
+    <>
+      <div className="page-bg"></div>
+      <div className="results-page">
+        <header className="results-header">
+          <button className="back-btn" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4" />
+            BACK TO SEARCH
+          </button>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ fontSize: "12px", opacity: 0.5 }}>SCANNED TARGET</p>
+            <p style={{ fontSize: "14px", fontWeight: "500" }}>{repoUrl}</p>
+          </div>
+        </header>
 
-        <div>
-          <h2
-            className={`text-lg font-semibold ${
-              isSafe ? "text-emerald-700" : "text-red-700"
-            }`}
-          >
-            {isSafe
-              ? "No security risks detected"
-              : "Security risks detected"}
-          </h2>
-          <p className="text-gray-700 text-sm mt-1">
-            {isSafe
-              ? "This repository does not show signs of malicious behavior."
-              : "This repository contains patterns commonly associated with unsafe or malicious behavior."}
-          </p>
-        </div>
-      </div>
+        <div className="result-main-card">
+          <div className={`verdict-banner ${isSafe ? "safe" : "danger"}`}>
+            {isSafe ? (
+              <ShieldCheck className="w-16 h-16 text-emerald-400" />
+            ) : (
+              <ShieldAlert className="w-16 h-16 text-red-400" />
+            )}
+            <div>
+              <h2 style={{ fontSize: "32px", fontWeight: "600" }}>
+                {isSafe ? "CLEAN" : "THREAT DETECTED"}
+              </h2>
+              <p style={{ opacity: 0.8, fontSize: "16px" }}>
+                {isSafe
+                  ? "Scan complete. No malicious patterns or security risks found in the specified repository."
+                  : "Caution: Our analysis has identified potential security risks that require your attention."}
+              </p>
+            </div>
+          </div>
 
-      {/* Summary */}
-      <div className="mt-6">
-        <h3 className="font-semibold mb-2">Scan Summary</h3>
-        <ul className="text-sm text-gray-700 space-y-1">
-          <li>Risk Score: {risk.score}</li>
-          <li>Verdict: {risk.verdict}</li>
-          <li>Policy Decision: {policy.decision}</li>
-        </ul>
-      </div>
+          <div className="stats-grid">
+            <div className="stat-item">
+              <div className="stat-label">RISK SCORE</div>
+              <div className="stat-value" style={{ color: isSafe ? '#88ffaa' : '#ff8888' }}>
+                {risk.score}/10
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">POLICY DECISION</div>
+              <div className="stat-value">{policy.decision}</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">VERDICT</div>
+              <div className="stat-value">{risk.verdict}</div>
+            </div>
+          </div>
 
-      {/* ✅ PRACTICAL RISKY CODE DETAILS */}
-      {ai?.explanation && ai.explanation.length > 0 && (
-        <div className="mt-8">
-          <h3 className="font-semibold mb-4 flex items-center gap-2">
-            <FileWarning className="w-5 h-5 text-red-600" />
-            Risky Code Details
+          <h3 className="findings-title">
+            <Shield className="w-6 h-6" style={{ color: "#88ffaa" }} />
+            DETAILED FINDINGS
           </h3>
 
-          <div className="space-y-4">
-            {ai.explanation.map((item, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-xl p-4 bg-gray-50"
-              >
-                <p className="text-sm">
-                  <strong>File:</strong>{" "}
-                  <span className="font-mono">{item.file}</span>
-                </p>
+          {ai?.explanation && ai.explanation.length > 0 ? (
+            <div className="findings-list">
+              {ai.explanation.map((item, index) => (
+                <div key={index} className="finding-card">
+                  <div className="finding-header">
+                    <div>
+                      <p style={{ fontSize: "12px", opacity: 0.6, marginBottom: "4px" }}>FILE PATH</p>
+                      <p style={{ fontWeight: "500" }}>{item.file}</p>
+                    </div>
+                    <span className={`severity-badge severity-${(item.severity || 'low').toLowerCase()}`}>
+                      {item.severity}
+                    </span >
+                  </div>
 
-                <p className="text-sm mt-1">
-                  <strong>Issue:</strong> {item.issue}
-                </p>
+                  <div style={{ marginTop: "20px" }}>
+                    <p style={{ fontSize: "14px", color: "#88ffaa" }}>
+                      <strong>{item.issue}</strong>
+                    </p>
+                    <p style={{ fontSize: "14px", opacity: 0.8, marginTop: "4px" }}>
+                      {item.why_risky}
+                    </p>
+                  </div>
 
-                <p className="text-sm mt-1">
-                  <strong>Severity:</strong> {item.severity}
-                </p>
-
-                <p className="text-sm mt-2">
-                  <strong>Code Pattern:</strong>{" "}
-                  <span className="font-mono text-gray-800">
+                  <div className="mono-box">
                     {item.pattern}
-                  </span>
-                </p>
+                  </div>
 
-                <p className="text-sm mt-2 text-red-700">
-                  <strong>Why Risky:</strong> {item.why_risky}
-                </p>
-
-                <p className="text-sm mt-2 text-gray-700">
-                  <strong>Impact:</strong> {item.impact}
-                </p>
-              </div>
-            ))}
-          </div>
+                  <div style={{ marginTop: "15px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                    <Zap className="w-4 h-4 text-emerald-400 flex-shrink-0" style={{ marginTop: "3px" }} />
+                    <p style={{ fontSize: "13px", opacity: 0.7 }}>
+                      {item.impact}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ padding: "40px", textAlign: "center", background: "rgba(255,255,255,0.02)", borderRadius: "20px", border: "1px dashed rgba(255,255,255,0.1)" }}>
+              <p style={{ opacity: 0.5 }}>No specific line-item risks were detected. Repository appears compliant with standard policies.</p>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+
+        <footer style={{ marginTop: "40px", textAlign: "center", opacity: 0.4, fontSize: "13px" }}>
+          Report generated by RepoShield Security Engine v0.1.0-alpha
+        </footer>
+      </div>
+    </>
   );
 }
