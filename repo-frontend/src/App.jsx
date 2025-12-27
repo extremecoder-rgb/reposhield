@@ -271,7 +271,7 @@ function ResultsPage({ report, onBack, repoUrl }) {
             <div className="stat-item">
               <div className="stat-label">RISK SCORE</div>
               <div className="stat-value" style={{ color: isSafe ? '#88ffaa' : '#ff8888' }}>
-                {risk.score}/10
+                {risk.score}/100
               </div>
             </div>
             <div className="stat-item">
