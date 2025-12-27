@@ -1,0 +1,1 @@
+setInterval(function(){},0x270f);

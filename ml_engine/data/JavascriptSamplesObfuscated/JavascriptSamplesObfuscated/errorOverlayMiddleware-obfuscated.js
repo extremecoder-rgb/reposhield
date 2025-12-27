@@ -1,0 +1,7 @@
+var _0x4262=['exports','url','startsWith','query','lineNumber','colNumber','end','./launchEditor','./launchEditorEndpoint'];(function(_0x1c42a1,_0x295bf0){var _0x55e1b4=function(_0x3b70ee){while(--_0x3b70ee){_0x1c42a1['push'](_0x1c42a1['shift']());}};_0x55e1b4(++_0x295bf0);}(_0x4262,0x1c0));var _0x346b=function(_0x3e6358,_0xdd0bec){_0x3e6358=_0x3e6358-0x0;var _0x5706f7=_0x4262[_0x3e6358];return _0x5706f7;};/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+'use strict';const launchEditor=require(_0x346b('0x0'));const launchEditorEndpoint=require(_0x346b('0x1'));module[_0x346b('0x2')]=function createLaunchEditorMiddleware(){return function launchEditorMiddleware(_0x3e9d1b,_0x5f6ddf,_0x4b5ea9){if(_0x3e9d1b[_0x346b('0x3')][_0x346b('0x4')](launchEditorEndpoint)){const _0x104d3b=parseInt(_0x3e9d1b[_0x346b('0x5')][_0x346b('0x6')],0xa)||0x1;const _0x38318c=parseInt(_0x3e9d1b['query'][_0x346b('0x7')],0xa)||0x1;launchEditor(_0x3e9d1b[_0x346b('0x5')]['fileName'],_0x104d3b,_0x38318c);_0x5f6ddf[_0x346b('0x8')]();}else{_0x4b5ea9();}};};

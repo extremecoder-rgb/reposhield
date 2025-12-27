@@ -1,0 +1,10 @@
+var _0x4aca=['clip','number','simple','highQuality','balanced','func','bool','string','DeprecatedColorPropType','DeprecatedEdgeInsetsPropType','DeprecatedStyleSheetPropType','prop-types','TextStylePropTypes','exports','oneOf','head','middle','tail'];(function(_0xd87398,_0x42f59f){var _0x153650=function(_0x4ca39e){while(--_0x4ca39e){_0xd87398['push'](_0xd87398['shift']());}};_0x153650(++_0x42f59f);}(_0x4aca,0xaa));var _0x37a2=function(_0x4b0568,_0x405d2b){_0x4b0568=_0x4b0568-0x0;var _0x4b976e=_0x4aca[_0x4b0568];return _0x4b976e;};/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow
+ * @format
+ */
+'use strict';const DeprecatedColorPropType=require(_0x37a2('0x0'));const DeprecatedEdgeInsetsPropType=require(_0x37a2('0x1'));const DeprecatedStyleSheetPropType=require(_0x37a2('0x2'));const PropTypes=require(_0x37a2('0x3'));const TextStylePropTypes=require(_0x37a2('0x4'));const stylePropType=DeprecatedStyleSheetPropType(TextStylePropTypes);module[_0x37a2('0x5')]={'ellipsizeMode':PropTypes[_0x37a2('0x6')]([_0x37a2('0x7'),_0x37a2('0x8'),_0x37a2('0x9'),_0x37a2('0xa')]),'numberOfLines':PropTypes[_0x37a2('0xb')],'textBreakStrategy':PropTypes[_0x37a2('0x6')]([_0x37a2('0xc'),_0x37a2('0xd'),_0x37a2('0xe')]),'onLayout':PropTypes[_0x37a2('0xf')],'onPress':PropTypes[_0x37a2('0xf')],'onLongPress':PropTypes[_0x37a2('0xf')],'pressRetentionOffset':DeprecatedEdgeInsetsPropType,'selectable':PropTypes[_0x37a2('0x10')],'selectionColor':DeprecatedColorPropType,'suppressHighlighting':PropTypes[_0x37a2('0x10')],'style':stylePropType,'testID':PropTypes[_0x37a2('0x11')],'nativeID':PropTypes[_0x37a2('0x11')],'allowFontScaling':PropTypes['bool'],'maxFontSizeMultiplier':PropTypes[_0x37a2('0xb')],'accessible':PropTypes[_0x37a2('0x10')],'adjustsFontSizeToFit':PropTypes['bool'],'minimumFontScale':PropTypes[_0x37a2('0xb')],'disabled':PropTypes['bool']};

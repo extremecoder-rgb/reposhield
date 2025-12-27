@@ -1,0 +1,5 @@
+var _0x53e9=['method','user','url','isCheater','danger','GET','/challenges/current-challenge','/map-aside'];(function(_0x2699a9,_0x501e82){var _0x5b6c40=function(_0xa3de42){while(--_0xa3de42){_0x2699a9['push'](_0x2699a9['shift']());}};_0x5b6c40(++_0x501e82);}(_0x53e9,0xf5));var _0x5bb7=function(_0x3fd533,_0x2c96f8){_0x3fd533=_0x3fd533-0x0;var _0x1c550b=_0x53e9[_0x3fd533];return _0x1c550b;};import _0x2499ef from'dedent';const ALLOWED_METHODS=[_0x5bb7('0x0')];const EXCLUDED_PATHS=['/api/flyers/findOne',_0x5bb7('0x1'),'/challenges/next-challenge',_0x5bb7('0x2'),'/signout'];export default function flashCheaters(){return function(_0x507cf2,_0x2b79a5,_0x27c610){if(ALLOWED_METHODS['indexOf'](_0x507cf2[_0x5bb7('0x3')])!==-0x1&&EXCLUDED_PATHS['indexOf'](_0x507cf2['path'])===-0x1&&_0x507cf2[_0x5bb7('0x4')]&&_0x507cf2[_0x5bb7('0x5')]!=='/'&&_0x507cf2[_0x5bb7('0x4')][_0x5bb7('0x6')]){_0x507cf2['flash'](_0x5bb7('0x7'),_0x2499ef`
+          Upon review, this account has been flagged for academic
+          dishonesty. If you’re the owner of this account contact
+          team@freecodecamp.org for details.
+        `);}return _0x27c610();};}

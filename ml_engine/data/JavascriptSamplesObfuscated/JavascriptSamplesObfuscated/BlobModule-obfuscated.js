@@ -1,0 +1,1 @@
+const BlobModule={'createFromParts'(){},'release'(){}};module['exports']=BlobModule;

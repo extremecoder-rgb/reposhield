@@ -1,0 +1,10 @@
+var _0x5154=['DeprecatedColorPropType','prop-types','DeprecatedShadowPropTypesIOS','DeprecatedTransformPropTypes','oneOf','center','contain','cover','visible','hidden','number','string'];(function(_0x40d480,_0x4b9154){var _0x5226e4=function(_0x4fbcea){while(--_0x4fbcea){_0x40d480['push'](_0x40d480['shift']());}};_0x5226e4(++_0x4b9154);}(_0x5154,0x120));var _0x5eb1=function(_0x400aa2,_0x22b5ec){_0x400aa2=_0x400aa2-0x0;var _0x29c18b=_0x5154[_0x400aa2];return _0x29c18b;};/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow
+ * @format
+ */
+'use strict';const DeprecatedColorPropType=require(_0x5eb1('0x0'));const DeprecatedLayoutPropTypes=require('DeprecatedLayoutPropTypes');const ReactPropTypes=require(_0x5eb1('0x1'));const DeprecatedShadowPropTypesIOS=require(_0x5eb1('0x2'));const DeprecatedTransformPropTypes=require(_0x5eb1('0x3'));const ImageStylePropTypes={...DeprecatedLayoutPropTypes,...DeprecatedShadowPropTypesIOS,...DeprecatedTransformPropTypes,'resizeMode':ReactPropTypes[_0x5eb1('0x4')]([_0x5eb1('0x5'),_0x5eb1('0x6'),_0x5eb1('0x7'),'repeat','stretch']),'backfaceVisibility':ReactPropTypes[_0x5eb1('0x4')]([_0x5eb1('0x8'),_0x5eb1('0x9')]),'backgroundColor':DeprecatedColorPropType,'borderColor':DeprecatedColorPropType,'borderWidth':ReactPropTypes['number'],'borderRadius':ReactPropTypes[_0x5eb1('0xa')],'overflow':ReactPropTypes['oneOf'](['visible',_0x5eb1('0x9')]),'tintColor':DeprecatedColorPropType,'opacity':ReactPropTypes[_0x5eb1('0xa')],'overlayColor':ReactPropTypes[_0x5eb1('0xb')],'borderTopLeftRadius':ReactPropTypes[_0x5eb1('0xa')],'borderTopRightRadius':ReactPropTypes[_0x5eb1('0xa')],'borderBottomLeftRadius':ReactPropTypes[_0x5eb1('0xa')],'borderBottomRightRadius':ReactPropTypes['number']};module['exports']=ImageStylePropTypes;

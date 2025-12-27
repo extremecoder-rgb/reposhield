@@ -1,0 +1,10 @@
+var _0x3ed9=['auto','scale','stretch','repeat','center','func','DeprecatedEdgeInsetsPropType','DeprecatedImageSourcePropType','DeprecatedImageStylePropTypes','DeprecatedStyleSheetPropType','exports','shape','string','number','bool','node','oneOf'];(function(_0x4dc8b4,_0x4fe770){var _0x364196=function(_0x2e6f83){while(--_0x2e6f83){_0x4dc8b4['push'](_0x4dc8b4['shift']());}};_0x364196(++_0x4fe770);}(_0x3ed9,0x15a));var _0x2d57=function(_0x944ddc,_0x45641e){_0x944ddc=_0x944ddc-0x0;var _0x5c3dd6=_0x3ed9[_0x944ddc];return _0x5c3dd6;};/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow
+ * @format
+ */
+'use strict';const DeprecatedEdgeInsetsPropType=require(_0x2d57('0x0'));const DeprecatedImageSourcePropType=require(_0x2d57('0x1'));const DeprecatedImageStylePropTypes=require(_0x2d57('0x2'));const DeprecatedStyleSheetPropType=require(_0x2d57('0x3'));const PropTypes=require('prop-types');module[_0x2d57('0x4')]={'style':DeprecatedStyleSheetPropType(DeprecatedImageStylePropTypes),'source':DeprecatedImageSourcePropType,'defaultSource':PropTypes['oneOfType']([PropTypes[_0x2d57('0x5')]({'uri':PropTypes[_0x2d57('0x6')],'width':PropTypes[_0x2d57('0x7')],'height':PropTypes[_0x2d57('0x7')],'scale':PropTypes[_0x2d57('0x7')]}),PropTypes[_0x2d57('0x7')]]),'accessible':PropTypes[_0x2d57('0x8')],'accessibilityLabel':PropTypes[_0x2d57('0x9')],'blurRadius':PropTypes[_0x2d57('0x7')],'capInsets':DeprecatedEdgeInsetsPropType,'resizeMethod':PropTypes[_0x2d57('0xa')]([_0x2d57('0xb'),'resize',_0x2d57('0xc')]),'resizeMode':PropTypes[_0x2d57('0xa')](['cover','contain',_0x2d57('0xd'),_0x2d57('0xe'),_0x2d57('0xf')]),'testID':PropTypes[_0x2d57('0x6')],'onLayout':PropTypes[_0x2d57('0x10')],'onLoadStart':PropTypes[_0x2d57('0x10')],'onProgress':PropTypes['func'],'onError':PropTypes[_0x2d57('0x10')],'onPartialLoad':PropTypes[_0x2d57('0x10')],'onLoad':PropTypes[_0x2d57('0x10')],'onLoadEnd':PropTypes[_0x2d57('0x10')]};

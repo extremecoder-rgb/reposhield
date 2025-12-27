@@ -1,0 +1,1 @@
+import _0x2528ad from'./server/modules/index';import _0x53dfc4 from'./server/directives/index';import{isUnaryTag,canBeLeftOpenTag}from'./compiler/util';import{createBasicRenderer}from'server/create-basic-renderer';export default createBasicRenderer({'modules':_0x2528ad,'directives':_0x53dfc4,'isUnaryTag':isUnaryTag,'canBeLeftOpenTag':canBeLeftOpenTag});
