@@ -6,12 +6,17 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   color: #ffffff;
   background: #000;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
 }
 
 .page-bg {
@@ -578,22 +583,618 @@ nav a:hover {
   font-size: 48px;
 }
 
-@media (max-width: 768px) {
-  .hero-glass h1 {
-    font-size: 42px;
+/* =========================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ========================================= */
+
+/* Tablet and below (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .hero-glass {
+    width: 95%;
+    padding: 30px 40px 60px;
   }
 
-  .search-box {
-    padding: 8px 12px 8px 15px;
+  .hero-glass h1 {
+    font-size: 52px;
   }
 
   .features {
+    gap: 30px;
+    padding: 120px 30px;
+  }
+
+  .feature-card {
+    width: 280px;
+  }
+
+  .tagline h2 {
+    font-size: 40px;
+  }
+}
+
+/* Tablet Portrait (max-width: 768px) */
+@media (max-width: 768px) {
+
+  /* Navbar */
+  .navbar {
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px 0 30px;
+  }
+
+  .logo {
+    order: 1;
+  }
+
+  nav {
+    order: 3;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    margin: 8px 12px;
+    font-size: 13px;
+  }
+
+  .signup-btn {
+    order: 2;
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+
+  .user-profile-button {
+    order: 2;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding-top: 40px;
+  }
+
+  .hero-glass {
+    width: 95%;
+    padding: 25px 30px 50px;
+    min-height: auto;
+  }
+
+  .hero-glass h1 {
+    font-size: 42px;
+    margin-top: 30px;
+  }
+
+  .hero-glass p {
+    font-size: 14px;
+    margin-top: 20px;
+  }
+
+  /* Search Box */
+  .search-box-container {
+    margin: 40px auto 15px;
+  }
+
+  .search-box {
+    padding: 6px 10px 6px 20px;
+    flex-wrap: wrap;
+  }
+
+  .search-box input {
+    font-size: 16px;
+    padding: 12px 0;
+    min-width: 0;
+  }
+
+  .search-btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .ml-scan-btn {
+    margin-left: 8px !important;
+  }
+
+  .progress-container {
+    left: 30px;
+    right: 110px;
+  }
+
+  .scanning-text {
+    font-size: 13px;
+  }
+
+  /* Hand Image */
+  .hand-wrapper {
+    margin-top: -60px;
+  }
+
+  .hand-image {
+    scale: 1.3;
+    margin: 80px 0;
+  }
+
+  /* Features */
+  .features {
     flex-direction: column;
+    align-items: center;
     padding: 100px 20px;
+    gap: 25px;
+    margin-top: 80px;
+  }
+
+  .feature-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 35px 25px;
+  }
+
+  /* Results Page */
+  .results-page {
+    padding: 30px 15px 80px;
+  }
+
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .results-header>div {
+    text-align: left !important;
+  }
+
+  .result-main-card {
+    padding: 25px;
+  }
+
+  .verdict-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 25px;
+  }
+
+  .verdict-banner h2 {
+    font-size: 28px !important;
+  }
+
+  .verdict-banner p {
+    font-size: 14px !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .stat-item {
     text-align: center;
+  }
+
+  .findings-title {
+    font-size: 18px;
+  }
+
+  .finding-card {
+    padding: 20px;
+  }
+
+  .finding-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .mono-box {
+    font-size: 12px;
+    overflow-x: auto;
+  }
+
+  /* Tagline */
+  .tagline {
+    padding: 80px 20px;
+    margin-top: 60px;
+  }
+
+  .tagline h2 {
+    font-size: 32px;
+    line-height: 1.3;
+  }
+
+  /* Auth Modal */
+  .auth-modal {
+    width: 95%;
+    padding: 30px;
+  }
+
+  .auth-modal-content h2 {
+    font-size: 26px;
+  }
+
+  /* User Dropdown */
+  .user-dropdown {
+    width: 240px;
+  }
+
+  /* OAuth Callback */
+  .oauth-callback-card {
+    padding: 40px 30px;
+  }
+}
+
+/* Mobile Landscape & Small Tablets (max-width: 640px) */
+@media (max-width: 640px) {
+  .hero-glass h1 {
+    font-size: 36px;
+  }
+
+  .search-box-container {
+    max-width: 100%;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+  }
+
+  .tagline h2 {
+    font-size: 28px;
+  }
+}
+
+/* Mobile Portrait (max-width: 480px) */
+@media (max-width: 480px) {
+
+  /* Navbar */
+  .navbar {
+    padding: 10px 0 20px;
+  }
+
+  .logo span {
+    font-size: 12px;
+  }
+
+  .logo img {
+    height: 24px;
+  }
+
+  nav a {
+    margin: 6px 8px;
+    font-size: 11px;
+  }
+
+  .signup-btn {
+    padding: 6px 16px;
+    font-size: 12px;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding-top: 30px;
+  }
+
+  .hero-glass {
+    width: 98%;
+    padding: 20px 20px 40px;
+    border-radius: 16px;
+  }
+
+  .hero-glass h1 {
+    font-size: 32px;
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
+
+  .hero-glass p {
+    font-size: 13px;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  /* Search Box */
+  .search-box-container {
+    margin: 30px auto 15px;
+  }
+
+  .search-box {
+    padding: 5px 8px 5px 15px;
+    border-radius: 30px;
+  }
+
+  .search-box input {
+    font-size: 14px;
+    padding: 10px 0;
+  }
+
+  .search-box input::placeholder {
+    font-size: 13px;
+  }
+
+  .search-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .search-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ml-scan-btn {
+    margin-left: 6px !important;
+  }
+
+  .progress-container {
+    left: 20px;
+    right: 100px;
+  }
+
+  .scanning-feedback {
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .scanning-text {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero-glass small {
+    font-size: 11px;
+  }
+
+  /* Hand Image */
+  .hand-wrapper {
+    margin-top: -50px;
+  }
+
+  .hand-image {
+    scale: 1.1;
+    margin: 60px 0;
+  }
+
+  /* Features */
+  .features {
+    padding: 80px 15px;
+    margin-top: 60px;
+    background-size: 100%;
+  }
+
+  .feature-card {
+    padding: 30px 20px;
+  }
+
+  .feature-card .icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+
+  .feature-card h3 {
+    font-size: 16px;
+  }
+
+  .feature-card p {
+    font-size: 13px;
+  }
+
+  /* Results Page */
+  .results-page {
+    padding: 20px 10px 60px;
+  }
+
+  .back-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .back-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .results-header p {
+    font-size: 11px !important;
+  }
+
+  .result-main-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .verdict-banner {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .verdict-banner svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .verdict-banner h2 {
+    font-size: 24px !important;
+  }
+
+  .verdict-banner p {
+    font-size: 13px !important;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .findings-title {
+    font-size: 16px;
+  }
+
+  .findings-title svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .finding-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .finding-card p {
+    font-size: 13px !important;
+  }
+
+  .severity-badge {
+    font-size: 10px;
+    padding: 3px 10px;
+  }
+
+  .mono-box {
+    font-size: 11px;
+    padding: 10px;
+  }
+
+  /* Tagline */
+  .tagline {
+    padding: 60px 15px;
+    margin-top: 40px;
+  }
+
+  .tagline h2 {
+    font-size: 24px;
+    line-height: 1.4;
+  }
+
+  /* Auth Modal */
+  .auth-modal {
+    padding: 25px;
+    border-radius: 20px;
+  }
+
+  .auth-modal-content h2 {
+    font-size: 22px;
+  }
+
+  .auth-modal-content p {
+    font-size: 14px;
+  }
+
+  .github-login-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+
+  /* User Profile */
+  .user-profile-button {
+    padding: 4px 12px 4px 4px;
+    gap: 8px;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .user-name {
+    font-size: 12px;
+  }
+
+  .user-dropdown {
+    width: 220px;
+    right: -10px;
+  }
+
+  .dropdown-header {
+    padding: 10px;
+  }
+
+  .dropdown-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dropdown-username {
+    font-size: 14px;
+  }
+
+  .dropdown-item {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  /* OAuth Callback */
+  .oauth-callback-card {
+    padding: 30px 20px;
+    border-radius: 20px;
+  }
+
+  .oauth-callback-card h2 {
+    font-size: 20px;
+  }
+
+  .oauth-callback-card p {
+    font-size: 14px;
+  }
+
+  footer {
+    font-size: 11px !important;
+  }
+}
+
+/* Extra Small Devices (max-width: 360px) */
+@media (max-width: 360px) {
+  .hero-glass h1 {
+    font-size: 28px;
+  }
+
+  .search-box {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .search-box input {
+    padding: 12px;
+    text-align: center;
+  }
+
+  .search-btn,
+  .ml-scan-btn {
+    width: 100%;
+    height: 45px;
+    border-radius: 12px !important;
+    margin: 5px 0 0 0 !important;
+  }
+
+  .progress-container {
+    left: 10px;
+    right: 10px;
+    bottom: 5px;
+  }
+
+  .navbar {
+    flex-direction: column;
+  }
+
+  nav {
+    order: 2;
+  }
+
+  .signup-btn,
+  .user-profile-button {
+    order: 3;
+  }
+
+  .feature-card h3 {
+    font-size: 15px;
+  }
+
+  .tagline h2 {
+    font-size: 20px;
   }
 }
 
@@ -650,6 +1251,7 @@ nav a:hover {
   font-size: 32px;
   margin-bottom: 16px;
   background: linear-gradient(to right, #fff, #88ffaa);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -840,6 +1442,7 @@ nav a:hover {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -851,6 +1454,7 @@ nav a:hover {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

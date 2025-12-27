@@ -8,7 +8,7 @@ import { LogOut, Crown, User, CreditCard } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import { logout as logoutAPI } from '../../utils/api-auth';
 
-export default function UserProfile() {
+export default function UserProfile({ onUpgradeClick }) {
   const { user, accessToken, logout, isPremium } = useAuthStore();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -25,6 +25,13 @@ export default function UserProfile() {
       logout();
       setIsLoggingOut(false);
       setShowDropdown(false);
+    }
+  };
+
+  const handleUpgradeClick = () => {
+    setShowDropdown(false);
+    if (onUpgradeClick) {
+      onUpgradeClick();
     }
   };
 
@@ -74,7 +81,10 @@ export default function UserProfile() {
           </button>
 
           {!isPremium() && (
-            <button className="dropdown-item upgrade-item">
+            <button 
+              className="dropdown-item upgrade-item"
+              onClick={handleUpgradeClick}
+            >
               <CreditCard size={16} />
               Upgrade to Premium
             </button>
