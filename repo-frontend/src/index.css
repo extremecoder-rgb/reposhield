@@ -596,3 +596,319 @@ nav a:hover {
     text-align: center;
   }
 }
+
+/* =========================================
+   AUTH & MODAL STYLES (ADDED)
+   ========================================= */
+
+/* Auth Modal Styling */
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.auth-modal {
+  background: linear-gradient(135deg, rgba(20, 30, 25, 0.95), rgba(10, 15, 10, 0.98));
+  border: 1px solid rgba(120, 255, 180, 0.2);
+  border-radius: 24px;
+  width: 90%;
+  max-width: 450px;
+  padding: 40px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-modal-btn:hover {
+  color: #fff;
+}
+
+.auth-modal-content {
+  text-align: center;
+}
+
+.auth-modal-content h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  margin-bottom: 16px;
+  background: linear-gradient(to right, #fff, #88ffaa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-modal-content p {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+.auth-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+/* GitHub Login Button Styling */
+.github-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #24292e;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.github-login-btn:hover {
+  background: #2f363d;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.auth-footer-text {
+  font-size: 12px !important;
+  opacity: 0.5;
+  margin-bottom: 0 !important;
+}
+
+/* User Profile Styles */
+.user-profile-container {
+  position: relative;
+}
+
+.user-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 16px 6px 6px;
+  border-radius: 30px;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.user-profile-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.premium-icon {
+  color: #ffd700;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 260px;
+  background: #1a1f1c;
+  border: 1px solid rgba(120, 255, 180, 0.15);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  animation: slideUpFade 0.2s ease;
+}
+
+.dropdown-header {
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.dropdown-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.dropdown-username {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.free-badge {
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 6px 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.upgrade-item {
+  color: #88ffaa;
+}
+
+.upgrade-item:hover {
+  background: rgba(35, 120, 60, 0.2);
+}
+
+.logout-item:hover {
+  background: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* OAuth Callback Page */
+.oauth-callback-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 10;
+  position: relative;
+}
+
+.oauth-callback-card {
+  background: rgba(20, 30, 25, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 60px;
+  border-radius: 24px;
+  border: 1px solid rgba(120, 255, 180, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  animation: fadeIn 0.5s ease;
+}
+
+.callback-icon {
+  margin-bottom: 24px;
+  color: #2ea04f;
+}
+
+.callback-icon.error {
+  color: #ff4444;
+}
+
+.oauth-callback-card h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.oauth-callback-card p {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 30px;
+}
+
+.retry-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}

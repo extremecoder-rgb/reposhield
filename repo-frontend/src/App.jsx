@@ -9,10 +9,17 @@ import {
   ChevronRight,
   Shield,
   Zap,
+  X,
 } from "lucide-react";
 import { scanRepository } from "./api";
 import logoImg from "./assets/logo.png";
 import handImg from "./assets/real.png";
+
+// Auth Imports
+import useAuthStore from "./store/authStore";
+import LoginButton from "./components/auth/LoginButton";
+import UserProfile from "./components/auth/UserProfile";
+import OAuthCallback from "./components/auth/OAuthCallback";
 
 const LOADING_STEPS = [
   "ACCESSING GITHUB REPOSITORY...",
@@ -31,7 +38,18 @@ export default function App() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [report, setReport] = useState(null);
   const [error, setError] = useState(null);
-  const [view, setView] = useState("landing"); // 'landing' or 'results'
+  const [view, setView] = useState("landing"); // 'landing', 'results', 'callback'
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const { isAuthenticated } = useAuthStore();
+
+  // Handle OAuth Callback Route
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === "/auth/callback" || window.location.search.includes("code=")) {
+      setView("callback");
+    }
+  }, []);
 
   // Cycle through loading steps
   useEffect(() => {
@@ -90,6 +108,16 @@ export default function App() {
     setError(null);
   };
 
+  // Render Authentication Callback View
+  if (view === "callback") {
+    return (
+      <>
+        <div className="page-bg"></div>
+        <OAuthCallback />
+      </>
+    );
+  }
+
   if (view === "results" && report) {
     return (
       <ResultsPage
@@ -103,6 +131,30 @@ export default function App() {
   return (
     <>
       <div className="page-bg"></div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <div className="auth-modal-overlay">
+          <div className="auth-modal">
+            <button 
+              className="close-modal-btn"
+              onClick={() => setShowAuthModal(false)}
+            >
+              <X size={20} />
+            </button>
+            <div className="auth-modal-content">
+              <h2>Welcome to RepoShield</h2>
+              <p>Connect your GitHub account to verify ownership and unlock premium features like private repository scanning.</p>
+              <div className="auth-actions">
+                <LoginButton className="modal-login-btn" />
+              </div>
+              <p className="auth-footer-text">
+                By connecting, you agree to our Terms of Service and Privacy Policy.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="hero">
         <div className="hero-glass">
@@ -119,7 +171,16 @@ export default function App() {
               <a href="#">CONTACT</a>
             </nav>
 
-            <button className="signup-btn">SIGN UP</button>
+            {isAuthenticated ? (
+              <UserProfile />
+            ) : (
+              <button 
+                className="signup-btn"
+                onClick={() => setShowAuthModal(true)}
+              >
+                SIGN UP
+              </button>
+            )}
           </header>
 
           <h1>
