@@ -34,6 +34,271 @@
 
 ---
 
+## 📊 SWOT Analysis
+
+### Strengths 💪
+- **🎯 Zero-Execution Security**: Complete static analysis without running any third-party code, eliminating execution risks
+- **🧠 AST-Powered Intelligence**: Advanced Abstract Syntax Tree analysis for accurate detection beyond simple pattern matching
+- **🔐 Enterprise-Grade Authentication**: Robust GitHub OAuth + JWT implementation with secure token management
+- **💎 Premium Monetization**: Integrated payment system (Dodo Payments) with subscription management
+- **🎨 Modern Tech Stack**: Built with Python 3.11+, React 19, Vite, and Tailwind CSS for optimal performance
+- **📚 Comprehensive Documentation**: Detailed guides for architecture, scoring, philosophy, and implementation
+- **🛡️ Multi-Layer Analysis**: Combines obfuscation detection, secret scanning, static code analysis, and CI/CD security checks
+- **⚡ Instant Results**: Fast analysis with real-time feedback and progress indicators
+- **🎯 Context-Aware**: Intelligent filtering for MERN stacks, frontend projects, and common false positives
+
+### Weaknesses 🔍
+- **🌐 Language Limitation**: Currently focused on Python; limited support for TypeScript, Go, Rust, and other languages
+- **🔄 No Dynamic Analysis**: Static-only approach may miss runtime vulnerabilities and behavior-based threats
+- **📊 No Historical Tracking**: Lacks scan history and trend analysis for repositories over time
+- **👥 Single-User Focus**: No team collaboration features or multi-user workspace support
+- **⚠️ Potential False Positives**: Despite noise-cancellation, complex codebases may still trigger some false alerts
+- **🔌 Limited Integrations**: No webhook support or CI/CD pipeline integration yet
+- **📈 Scalability Unknown**: Performance on extremely large repositories (100k+ files) not yet tested
+- **🌍 No Multi-Language UI**: Interface currently available only in English
+
+### Opportunities 🚀
+- **🌐 Multi-Language Expansion**: Add support for JavaScript/TypeScript, Go, Rust, Java, C++, and other popular languages
+- **🤖 ML Enhancement**: Integrate machine learning for pattern recognition and predictive security analysis
+- **🔗 CI/CD Integration**: GitHub Actions, GitLab CI, Jenkins plugins for automated scanning
+- **📊 Analytics Dashboard**: Historical trends, vulnerability tracking, and security score evolution
+- **👥 Enterprise Features**: Team workspaces, role-based access control, and compliance reporting
+- **🌍 Global Expansion**: Multi-language UI support and localization
+- **📱 Mobile App**: iOS/Android apps for on-the-go security monitoring
+- **🔌 API Marketplace**: Public API for third-party integrations and custom workflows
+- **🎓 Educational Platform**: Security training modules and best practices guides
+- **🏢 White-Label Solution**: Customizable branding for enterprise clients
+
+### Threats ⚠️
+- **🏆 Established Competitors**: GitHub Advanced Security, Snyk, SonarQube with larger market share
+- **🆓 Free Alternatives**: Open-source tools like Bandit, Semgrep, and GitGuardian
+- **🔄 Rapid Tech Evolution**: New attack vectors and obfuscation techniques emerging constantly
+- **💰 Market Saturation**: Crowded security tools market with high customer acquisition costs
+- **🔐 Privacy Concerns**: Users may be hesitant to grant repository access to third-party services
+- **⚖️ Compliance Requirements**: GDPR, SOC 2, and other regulations requiring significant investment
+- **🚀 GitHub Native Features**: GitHub expanding built-in security features (Dependabot, CodeQL)
+- **💸 Economic Downturn**: Reduced security budgets affecting premium subscription adoption
+- **🔧 Maintenance Burden**: Keeping up with GitHub API changes and new language versions
+
+---
+
+## 🔄 Static Analyzer Architecture Flowchart
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          USER INTERACTION LAYER                              │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                     React Frontend (Vite + Tailwind)                  │  │
+│  │  • GitHub URL Input                                                   │  │
+│  │  • OAuth Login Button                                                 │  │
+│  │  • Real-time Progress Display                                         │  │
+│  │  • Results Visualization                                              │  │
+│  └────────────────────────────┬─────────────────────────────────────────┘  │
+└────────────────────────────────┼────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         AUTHENTICATION LAYER                                 │
+│                                                                              │
+│  ┌──────────────────┐      ┌──────────────────┐      ┌─────────────────┐  │
+│  │  GitHub OAuth    │─────▶│   JWT Manager    │─────▶│  Access Control │  │
+│  │  • State CSRF    │      │  • 15min Access  │      │  • Public: Free │  │
+│  │  • Code Exchange │      │  • 7day Refresh  │      │  • Private: $$  │  │
+│  └──────────────────┘      └──────────────────┘      └─────────────────┘  │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          API GATEWAY (Flask)                                 │
+│                                                                              │
+│  POST /scan ────▶ Validate URL ────▶ Check Access ────▶ Queue Analysis     │
+│                      │                    │                    │             │
+│                      ▼                    ▼                    ▼             │
+│                 Repo Public?         User Premium?      Start Scan Job      │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        REPOSITORY CLONING LAYER                              │
+│                                                                              │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                    Git Subprocess Manager                              │ │
+│  │  • Shallow Clone (--depth 1)                                          │ │
+│  │  • No Tags (--no-tags)                                                │ │
+│  │  • 300s Timeout                                                       │ │
+│  │  • Temp Directory Isolation                                           │ │
+│  │  • GitHub Token Injection (if private)                                │ │
+│  └───────────────────────────────┬───────────────────────────────────────┘ │
+└────────────────────────────────┼────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      STATIC ANALYSIS ORCHESTRATOR                            │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │                      File Discovery Engine                            │  │
+│  │  • Recursive Directory Walk                                           │  │
+│  │  • Extension Filtering (.py, .js, .env, .yml, etc.)                   │  │
+│  │  • Size Limits (skip >1MB files)                                      │  │
+│  │  • Ignore Patterns (node_modules, .git, dist, build)                  │  │
+│  └────────────────────────────┬─────────────────────────────────────────┘  │
+└────────────────────────────────┼────────────────────────────────────────────┘
+                                 │
+                                 ▼
+                    ┌────────────┴────────────┐
+                    │                         │
+                    ▼                         ▼
+┌──────────────────────────────┐  ┌──────────────────────────────┐
+│   PARALLEL ANALYZER MODULES  │  │   PARALLEL ANALYZER MODULES  │
+│                              │  │                              │
+│  ┌────────────────────────┐ │  │  ┌────────────────────────┐ │
+│  │ 1. OBFUSCATION ANALYZER│ │  │  │ 3. STATIC CODE ANALYZER│ │
+│  │ ─────────────────────  │ │  │  │ ─────────────────────  │ │
+│  │ • Entropy Calculation  │ │  │  │ • AST Parsing (Python) │ │
+│  │ • Base64 Detection     │ │  │  │ • Dangerous Calls:     │ │
+│  │ • Hex Pattern Matching │ │  │  │   - eval()             │ │
+│  │ • String Obfuscation   │ │  │  │   - exec()             │ │
+│  │ • Minification Check   │ │  │  │   - subprocess.call()  │ │
+│  │ • SVG/Asset Filtering  │ │  │  │   - os.system()        │ │
+│  │ • Frontend Noise Skip  │ │  │  │ • Import Analysis      │ │
+│  └────────────────────────┘ │  │  │ • Function Complexity  │ │
+│                              │  │  └────────────────────────┘ │
+│  ┌────────────────────────┐ │  │                              │
+│  │ 2. SECRETS ANALYZER    │ │  │  ┌────────────────────────┐ │
+│  │ ─────────────────────  │ │  │  │ 4. CI/CD ANALYZER      │ │
+│  │ • High-Entropy Strings │ │  │  │ ─────────────────────  │ │
+│  │ • Regex Patterns:      │ │  │  │ • .github/workflows/   │ │
+│  │   - AWS Keys           │ │  │  │ • .gitlab-ci.yml       │ │
+│  │   - GitHub Tokens      │ │  │  │ • Jenkinsfile          │ │
+│  │   - API Keys           │ │  │  │ • Dangerous Actions:   │ │
+│  │   - Private Keys       │ │  │  │   - curl | bash        │ │
+│  │   - JWT Tokens         │ │  │  │   - wget | sh          │ │
+│  │ • .env File Scanning   │ │  │  │   - npm install -g     │ │
+│  │ • Context Filtering    │ │  │  │ • Secret Exposure      │ │
+│  └────────────────────────┘ │  │  └────────────────────────┘ │
+└──────────────┬───────────────┘  └──────────────┬───────────────┘
+               │                                 │
+               └────────────┬────────────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         RISK SCORING ENGINE                                  │
+│                                                                              │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                    Weighted Scoring Algorithm                          │ │
+│  │                                                                        │ │
+│  │  Finding Severity Weights:                                            │ │
+│  │  ┌──────────────────────────────────────────────────────────────┐    │ │
+│  │  │ CRITICAL (100 pts)  : eval() with user input, hardcoded AWS  │    │ │
+│  │  │ HIGH (50 pts)       : exec(), subprocess, exposed secrets    │    │ │
+│  │  │ MEDIUM (25 pts)     : suspicious imports, obfuscated code    │    │ │
+│  │  │ LOW (10 pts)        : high entropy, potential secrets        │    │ │
+│  │  │ INFO (0 pts)        : recommendations, best practices        │    │ │
+│  │  └──────────────────────────────────────────────────────────────┘    │ │
+│  │                                                                        │ │
+│  │  Risk Score Calculation:                                              │ │
+│  │  ┌──────────────────────────────────────────────────────────────┐    │ │
+│  │  │ Total Score = Σ (Finding Weight × Confidence × Context)      │    │ │
+│  │  │                                                               │    │ │
+│  │  │ Risk Level:                                                   │    │ │
+│  │  │   • SAFE      : 0-20 points                                  │    │ │
+│  │  │   • LOW       : 21-50 points                                 │    │ │
+│  │  │   • MEDIUM    : 51-100 points                                │    │ │
+│  │  │   • HIGH      : 101-200 points                               │    │ │
+│  │  │   • CRITICAL  : 201+ points                                  │    │ │
+│  │  └──────────────────────────────────────────────────────────────┘    │ │
+│  └───────────────────────────────┬───────────────────────────────────────┘ │
+└────────────────────────────────┼────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        REPORT GENERATION LAYER                               │
+│                                                                              │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                         JSON Report Builder                            │ │
+│  │                                                                        │ │
+│  │  {                                                                     │ │
+│  │    "repository": "owner/repo",                                         │ │
+│  │    "risk_score": 150,                                                  │ │
+│  │    "risk_level": "HIGH",                                               │ │
+│  │    "findings": [                                                       │ │
+│  │      {                                                                 │ │
+│  │        "type": "DANGEROUS_CALL",                                       │ │
+│  │        "severity": "CRITICAL",                                         │ │
+│  │        "file": "app.py",                                               │ │
+│  │        "line": 42,                                                     │ │
+│  │        "code": "eval(user_input)",                                     │ │
+│  │        "message": "Dangerous eval() with user input",                 │ │
+│  │        "recommendation": "Use ast.literal_eval() instead",            │ │
+│  │        "why_it_matters": "Allows arbitrary code execution"            │ │
+│  │      }                                                                 │ │
+│  │    ],                                                                  │ │
+│  │    "summary": {                                                        │ │
+│  │      "total_files": 150,                                               │ │
+│  │      "analyzed_files": 120,                                            │ │
+│  │      "critical_findings": 2,                                           │ │
+│  │      "high_findings": 5,                                               │ │
+│  │      "medium_findings": 10                                             │ │
+│  │    }                                                                   │ │
+│  │  }                                                                     │ │
+│  └───────────────────────────────┬───────────────────────────────────────┘ │
+└────────────────────────────────┼────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          CLEANUP & RESPONSE                                  │
+│                                                                              │
+│  ┌──────────────────┐      ┌──────────────────┐      ┌─────────────────┐  │
+│  │  Delete Temp Dir │─────▶│  Send JSON to UI │─────▶│  Log Analytics  │  │
+│  │  • Secure Wipe   │      │  • WebSocket/HTTP│      │  • Scan Duration│  │
+│  │  • Error Handling│      │  • Pretty Format │      │  • Findings Log │  │
+│  └──────────────────┘      └──────────────────┘      └─────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          FRONTEND DISPLAY                                    │
+│                                                                              │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                     Results Visualization                              │ │
+│  │  • Risk Score Badge (Color-coded)                                     │ │
+│  │  • Findings Table (Sortable, Filterable)                              │ │
+│  │  • Code Snippets with Syntax Highlighting                             │ │
+│  │  • Recommendations Panel                                              │ │
+│  │  • Export Options (PDF, JSON, CSV)                                    │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 🔍 Analysis Flow Details
+
+**Phase 1: Pre-Analysis** (1-2 seconds)
+- URL validation and repository metadata fetch
+- Access control verification (public vs. private)
+- User authentication and premium status check
+
+**Phase 2: Repository Acquisition** (3-10 seconds)
+- Secure shallow clone with timeout protection
+- Temporary directory creation with isolation
+- GitHub token injection for private repositories
+
+**Phase 3: Parallel Analysis** (5-30 seconds depending on repo size)
+- All four analyzers run concurrently for speed
+- Each analyzer processes files independently
+- Results aggregated in real-time
+
+**Phase 4: Scoring & Reporting** (1-2 seconds)
+- Weighted risk calculation
+- Finding deduplication and prioritization
+- JSON report generation with actionable insights
+
+**Phase 5: Cleanup & Delivery** (<1 second)
+- Secure deletion of cloned repository
+- Response transmission to frontend
+- Analytics logging for improvement
+
+---
+
 ## 🛠️ Tech Stack
 
 ### Backend
