@@ -41,8 +41,9 @@ def create_app() -> Flask:
             return send_from_directory(frontend_dist, path)
             
         # 2. If it's a known API path but didn't match a blueprint (meaning 404)
+        # EXCEPTION: /auth/callback is a frontend route, not an API route
         api_prefixes = ['api/', 'auth/', 'scan', 'payments/']
-        if any(path.startswith(prefix) for prefix in api_prefixes):
+        if any(path.startswith(prefix) for prefix in api_prefixes) and path != 'auth/callback':
             return 'API Endpoint Not Found', 404
             
         # 3. For everything else (like /auth/callback or /dashboard), serve index.html
