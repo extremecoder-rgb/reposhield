@@ -34,30 +34,23 @@ def create_app() -> Flask:
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve_frontend(path):
-        """Serve React frontend static files"""
-        # Define backend API prefixes
-        api_prefixes = ['api/', 'scan', 'payments/']
+        """Serve React frontend static files with SPA routing"""
         
-        # If it's a backend API route (except for the frontend auth callback), 
-        # let it fall through to the blueprints or return 404 if not found
-        is_api_path = any(path.startswith(prefix) for prefix in api_prefixes)
-        is_backend_auth = path.startswith('auth/') and path != 'auth/callback'
-        
-        if is_api_path or is_backend_auth:
-            # If we are here, it means no blueprint matched this route (otherwise Flask would have handled it)
-            # So we return a 404
-            return 'API Endpoint Not Found', 404
-        
-        # Check if frontend dist folder exists
-        if not os.path.exists(frontend_dist):
-            return f"Frontend not built. Please run: cd repo-frontend && npm run build", 500
-        
-        # Serve static files if they exist (js, css, images, etc.)
+        # 1. Check if the path exists as a physical file in the frontend build
         if path and os.path.exists(os.path.join(frontend_dist, path)):
             return send_from_directory(frontend_dist, path)
-        
-        # For all other routes (including /auth/callback), serve index.html for SPA routing
-        return send_from_directory(frontend_dist, 'index.html')
+            
+        # 2. If it's a known API path but didn't match a blueprint (meaning 404)
+        api_prefixes = ['api/', 'auth/', 'scan', 'payments/']
+        if any(path.startswith(prefix) for prefix in api_prefixes):
+            return 'API Endpoint Not Found', 404
+            
+        # 3. For everything else (like /auth/callback or /dashboard), serve index.html
+        # This allows React Router to take over.
+        if os.path.exists(os.path.join(frontend_dist, 'index.html')):
+            return send_from_directory(frontend_dist, 'index.html')
+            
+        return "Frontend not built. Please run build script.", 500
 
     return app
 
